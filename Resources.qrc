@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/grass1">
+        <file>darkGrass.PNG</file>
+    </qresource>
+    <qresource prefix="/grass2">
+        <file>lightGrass.PNG</file>
+    </qresource>
+</RCC>
