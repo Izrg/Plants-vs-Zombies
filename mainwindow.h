@@ -6,7 +6,7 @@
 namespace Ui {
 class MainWindow;
 }
-
+class mainGame;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
