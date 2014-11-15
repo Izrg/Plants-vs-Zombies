@@ -5,4 +5,7 @@
     <qresource prefix="/grass2">
         <file>lightGrass.PNG</file>
     </qresource>
+    <qresource prefix="/sun">
+        <file>Sun.png</file>
+    </qresource>
 </RCC>
