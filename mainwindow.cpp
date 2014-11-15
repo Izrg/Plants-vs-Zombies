@@ -16,13 +16,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_startBtn_clicked()
 {
-
+    //Hide this current window
+    this->hide();
 
     //Show the new game window
     mG = new mainGame();
     mG->show();
-
-    //Hide this current window
-    this->close();
 }
 

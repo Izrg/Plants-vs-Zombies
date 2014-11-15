@@ -1,41 +1,29 @@
-using namespace std;
 #include "maingame.h"
 #include "ui_maingame.h"
-#include <mainwindow.h>
 #include <qdebug.h>
 #include <QGraphicsScene>
 #include <Qpixmap>
 #include <QPainter>
 #include <QGraphicsPixmapItem>
-#include <vector>
-#include <sun.h>
-#include <QtGlobal>
-#include <QTime>
-#include <QDebug>
-
-vector <Sun*> suns;
-vector <Sun*>::iterator sunIter;
-static int sunIndex = 0;
 
 mainGame::mainGame(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::mainGame)
 {
     ui->setupUi(this);
-    moveTimer = new QTimer(this);
+
     //Set up grass textures.
     grass1.load(":/grass1/darkGrass.PNG");
     grass2.load(":/grass2/lightGrass.PNG");
 
     WIDTH = ui->gameBoard->width() -10;
     HEIGHT = ui->gameBoard->height() - 5;
-    qDebug() << "WIDTH: " << WIDTH << "HEIGHT: " << HEIGHT << endl;
+
     scene = new QGraphicsScene(this);
     ui->gameBoard->setScene(scene);
 
     QGraphicsPixmapItem *item;
 
-    //Set the size of hte screen.
     QRectF rect(0,0,WIDTH,HEIGHT);
     scene->setSceneRect(rect);
 
@@ -46,11 +34,9 @@ mainGame::mainGame(QWidget *parent) :
     int widthStep = 0;
     int heightStep = 0;
     bool dark = true;
-
-//    //This loop is used to draw the grid.
+    //This loop is used to draw the grid.
     for(int i = 0; i < ROWS; i ++){
         for (int j = 0; j < COLUMNS; j++){
-
             //Alternate between dark and light grass squares.
             if(dark){
                 item = new QGraphicsPixmapItem(grass1);
@@ -75,28 +61,6 @@ mainGame::mainGame(QWidget *parent) :
         widthStep = 0;
     }
 
-    //Add new sun and add it to the scene.
-    suns.push_back(new Sun(((this->random(0,ROWS-1))*gameBlockHeight +(gameBlockHeight/4)),(this->random(0,COLUMNS-1)*gameBlockWidth + (gameBlockWidth/4))));
-
-    sunIter = suns.begin() + sunIndex;
-    sunIndex ++;
-    scene->addItem(*sunIter);
-
-    connect(moveTimer, SIGNAL(timeout()), scene, SLOT(advance()));
-    moveTimer->start(100);
-
-}
-
-//Return a random number
-int mainGame::random(int x1, int x2)
-{
-    return qrand() % ((x2 + 1) - x1) + x1;
-}
-
-
-int mainGame::getBlockHeight()
-{
-    return gameBlockHeight;
 }
 
 
@@ -107,9 +71,5 @@ mainGame::~mainGame()
 
 void mainGame::on_sunflowerBtn_clicked()
 {
-//    mW = new MainWindow();
-//    mW->show();
-//    this->close();
 
 }
-
