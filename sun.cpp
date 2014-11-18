@@ -24,6 +24,7 @@ void Sun::advance(int phase)
         return;
     }
 
+    //Move the sun down the scene.
     p = this->pos();
     setPos(p.x(), p.y() + 5);
 
