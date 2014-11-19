@@ -1,6 +1,6 @@
 #include "myview.h"
 #include <qdebug.h>
-
+#include <QMouseEvent>
 myView::myView(QWidget *parent) :
     QGraphicsView(parent)
 {
@@ -78,7 +78,16 @@ void myView::sunSpawn()
     scene->addItem(*sunIter);
 }
 
-void myView::mousePressEvent(QMouseEvent *)
+void myView::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "TEST1" << endl;
+    int range = Sun::W;
+    QPointF tempPoint = event->pos();
+    //Iterate through all the current suns.
+    for(sunIter = suns.begin(); sunIter != suns.end(); sunIter++){
+        //If the user clicks within the range of the sun...
+        if((qAbs(tempPoint.x() - (*(*sunIter)).getLocation().x()) <= range) && (qAbs(tempPoint.y() - (*(*sunIter)).getLocation().y()) <= range)){
+            qDebug() << "Sun!" << endl;
+        }
+    }
+
 }

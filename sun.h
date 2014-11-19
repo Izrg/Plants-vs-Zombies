@@ -13,9 +13,12 @@ class Sun : public QGraphicsPixmapItem
 public:
     Sun(int row, int column);
     QPointF p;
+    QPointF sunLocation;
     QPixmap sunPix;
     enum {W= 35};
     void advance(int phase);
+    void setLocation(int rX, int rY);
+    QPointF getLocation();
     int endRow;
 
 

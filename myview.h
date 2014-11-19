@@ -8,7 +8,7 @@
 #include <vector>
 #include <QTimer>
 #include <sun.h>
-
+class QMouseEvent;
 class myView : public QGraphicsView
 {
     Q_OBJECT
@@ -45,7 +45,7 @@ public slots:
     void sunSpawn();
     // QWidget interface
 protected:
-    void mousePressEvent(QMouseEvent *);
+    void mousePressEvent(QMouseEvent *event);
 
 private:
     QTimer *moveTimer;

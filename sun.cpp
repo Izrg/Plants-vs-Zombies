@@ -9,8 +9,12 @@ Sun::Sun(int row, int column)
     sunPix = sunPix.scaled(W,W);
     //Set the resting point.
     endRow = row;
-    qDebug() << "End row: " << endRow << endl;
-    qDebug() << "Column: " << column << endl;
+    //qDebug() << "End row: " << endRow << endl;
+    //qDebug() << "Column: " << column << endl;
+
+    setLocation(column,row);
+
+    //set the sun position on the screen.
     setPos(column,this->pos().y());
     setPixmap(sunPix);
 }
@@ -26,8 +30,24 @@ void Sun::advance(int phase)
 
     //Move the sun down the scene.
     p = this->pos();
+    //Change the location of the sun as it moves.
+    setLocation(p.x(), p.y() + 5);
+    //Set the new location on the screen
     setPos(p.x(), p.y() + 5);
 
+}
+
+//Set teh suns current location
+void Sun::setLocation(int rX, int rY)
+{
+    sunLocation.setX(rX);
+    sunLocation.setY(rY);
+}
+
+//Return the suns current location
+QPointF Sun::getLocation()
+{
+    return sunLocation;
 }
 
 
