@@ -1,8 +1,7 @@
 #include "sunflower.h"
-
+#include "sun.h"
 Sunflower::Sunflower()
 {
-    //sunMovie = new QMovie(":/Sunflower/Sunflower.gif");
     //Set up all the attributes of thhe plant.
     this->cost = 50;
     this->life = 4;
@@ -13,4 +12,15 @@ Sunflower::Sunflower()
     this->seeding = 7.5;
     this->sun = true;
     this->need = false;
+
+}
+
+void Sunflower::makeSun()
+{
+
+}
+
+QString Sunflower::getImagePath()
+{
+    return ":/Sunflower/Sunflower.gif";
 }

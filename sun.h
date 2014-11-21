@@ -12,6 +12,7 @@ class Sun : public QGraphicsPixmapItem
 {
 public:
     Sun(int row, int column);
+    Sun(QPointF rPoint);
 
     QPointF p;
     QPointF sunLocation;

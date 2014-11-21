@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     plant.cpp \
     defence.cpp \
     attack.cpp \
-    sunflower.cpp
+    sunflower.cpp \
+    peashooter.cpp
 
 HEADERS  += mainwindow.h \
     maingame.h \
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h \
     plant.h \
     defence.h \
     attack.h \
-    sunflower.h
+    sunflower.h \
+    peashooter.h
 
 FORMS    += mainwindow.ui \
     maingame.ui

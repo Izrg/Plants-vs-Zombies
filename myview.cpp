@@ -18,9 +18,10 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     scene = new QGraphicsScene(this);
     setScene(scene);
 
-    //Set the main game object to the maingame
+    //Set the main game object to the maingame class instance
     mG = rMG;
 
+    plantsIndex = 0; // Initilize the plants index to 0, no plants.
     //Set the size of hte screen.
     QRectF rect(0,0,WIDTH,HEIGHT);
     setSceneRect(rect);
@@ -34,7 +35,7 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     int heightStep = 0;
     bool dark = true;
 
-//    //This loop is used to draw the grid.
+   //This loop is used to draw the grid.
     for(int i = 0; i < ROWS; i ++){
         for (int j = 0; j < COLUMNS; j++){
             //Alternate between dark and light grass squares.
@@ -67,9 +68,6 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     sunIter = suns.begin() + sunIndex;
     sunIndex ++;
     scene->addItem(*sunIter);
-
-    moveTimer = new QTimer(this);
-    sunTimer = new QTimer(this);
 }
 
 //Returns a random number.
@@ -81,16 +79,46 @@ int myView::random(int x1, int x2)
 //Accept the plant the user wants to plant next
 void myView::acceptPlant(Plant *rPlant)
 {
-    //Get the plants pixmap
-    QPixmap tempPix = rPlant->pixmap();
+      //TODO: //Trying to put a gif into the graphicsview.
+//    plantLabel = new QLabel();
+//    plantGif = new QMovie(mG->plantImagePath);
+//    plantLabel->setMovie(plantGif);
+//    plantGif->start();
+
+
+    //&pObj = (&rPlant); // Sets the plant Object to the received plant;
+}
+
+void myView::plantNewPlant()
+{
+
+    //Pushes a new plant into the plants vector
+    plants.push_back(mG->getPlant());
+    plantsIter = plants.begin() + plantsIndex;
+    //Loads the new plants pixmap
+    QPixmap tempPix;
+    tempPix.load((*plantsIter)->getImagePath());
+    tempPix.scaled(W,W); // Scale the image to desired size
+    //Sets the new plants pixmap
+    (*plantsIter)->setImage(tempPix);
     //Create the pixmapItem
     item = new QGraphicsPixmapItem(tempPix);
 }
 
+//This is called on a timer to spawn suns throughout the game every 10s
 void myView::sunSpawn()
 {
-    //Add a new sun.
+    //Spawns a sun at a random column.
+    //The sun then drops to a random row.
     suns.push_back(new Sun(((this->random(0,ROWS-1))*gameBlockHeight +(gameBlockHeight/4)),(this->random(0,COLUMNS-1)*gameBlockWidth + (gameBlockWidth/4))));
+    sunIter = suns.begin() + sunIndex;
+    sunIndex ++;
+    scene->addItem(*sunIter);
+}
+//This is called for sunflowers to spawn suns.
+void myView::sunflowerSunSpawn()
+{
+    suns.push_back(new Sun(item->pos()));
     sunIter = suns.begin() + sunIndex;
     sunIndex ++;
     scene->addItem(*sunIter);
@@ -101,21 +129,26 @@ void myView::mousePressEvent(QMouseEvent *event)
 {
     int range = Sun::W;
     QPointF tempPoint = event->pos();
+    //If the user has selected to plant a plant
     if(mG->isPlantSelected){
         for(int i = 0; i < ROWS; i ++){
             for(int j = 0; j < COLUMNS; j++){
                 //If the user clicks within a grid item AND that grid item isnt filled...
                 if(grid[i][j].contains(event->pos()) && !gridFill[i][j]){
+                    plantNewPlant(); // Plant the new plant.
                     //Set the item position to the center of the grid.
                     item->setPos(grid[i][j].topLeft());
                     //Add the item to the scene.
                     scene->addItem(item);
+                    //QGraphicsProxyWidget *proxy = scene->addWidget(plantLabel);
                     gridFill[i][j] = true; //This grid space is now occupied.
-                    mG->removeSunPoints(); // remove the sun points for this plant.
+                    mG->removeSunPoints((*plantsIter)->getCost()); // remove the sun points for this plant.
+                    plantsIndex ++; // Increase plants index as a plant was just planted.
+                    //If the plant just planted has a "sun" value of true, start the sun planting timer.
                 }
             }
         }
-
+    //If the user is currently not planting a plant.
     }else{
         //Itterate through all the current suns
         for(sunIter = suns.begin(); sunIter != suns.end();){

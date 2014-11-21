@@ -8,6 +8,11 @@ public:
 
 protected:
     bool slow;
+
+
+    // Plant interface
+public:
+    QString getImagePath();
 };
 
 #endif // ATTACK_H

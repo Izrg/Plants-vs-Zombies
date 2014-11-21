@@ -11,6 +11,11 @@ void Plant::setImage(QPixmap rPix)
     setPixmap(rPix);
 }
 
+QString Plant::getImagePath()
+{
+
+}
+
 int Plant::getCost()
 {
     return cost;

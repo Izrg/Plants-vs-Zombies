@@ -5,3 +5,8 @@ Attack::Attack()
 
 
 }
+
+QString Attack::getImagePath()
+{
+
+}

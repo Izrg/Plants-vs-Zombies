@@ -4,3 +4,8 @@ Defence::Defence()
 {
 
 }
+
+QString Defence::getImagePath()
+{
+
+}

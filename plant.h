@@ -7,6 +7,7 @@ class Plant : public QGraphicsPixmapItem
 public:
     Plant();
     void setImage(QPixmap rPix);
+    virtual QString getImagePath();
     int getCost();
 protected:
     int cost;

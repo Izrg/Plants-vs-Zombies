@@ -11,4 +11,7 @@
     <qresource prefix="/Sunflower">
         <file>Sunflower.gif</file>
     </qresource>
+    <qresource prefix="/Plants">
+        <file>PeaShooter.gif</file>
+    </qresource>
 </RCC>

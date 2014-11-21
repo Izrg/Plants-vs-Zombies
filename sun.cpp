@@ -10,10 +10,21 @@ Sun::Sun(int row, int column)
     //Set the resting point.
     endRow = row;
 
+    //Stores the suns current location.
     setLocation(column,row);
 
     //set the sun position on the screen.
     setPos(column,this->pos().y());
+    setPixmap(sunPix);
+}
+
+Sun::Sun(QPointF rPoint)
+{
+    //Load sun image, and make it WxW
+    sunPix.load(":/sun/Sun.png");
+    sunPix = sunPix.scaled(W,W);
+
+    setPos(rPoint); // Sets the sun at the specific location.
     setPixmap(sunPix);
 }
 
