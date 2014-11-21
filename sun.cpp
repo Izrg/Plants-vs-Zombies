@@ -9,8 +9,6 @@ Sun::Sun(int row, int column)
     sunPix = sunPix.scaled(W,W);
     //Set the resting point.
     endRow = row;
-    //qDebug() << "End row: " << endRow << endl;
-    //qDebug() << "Column: " << column << endl;
 
     setLocation(column,row);
 

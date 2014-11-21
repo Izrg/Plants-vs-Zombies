@@ -16,12 +16,20 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     maingame.cpp \
     sun.cpp \
-    myview.cpp
+    myview.cpp \
+    plant.cpp \
+    defence.cpp \
+    attack.cpp \
+    sunflower.cpp
 
 HEADERS  += mainwindow.h \
     maingame.h \
     sun.h \
-    myview.h
+    myview.h \
+    plant.h \
+    defence.h \
+    attack.h \
+    sunflower.h
 
 FORMS    += mainwindow.ui \
     maingame.ui

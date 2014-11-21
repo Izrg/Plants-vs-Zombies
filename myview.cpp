@@ -1,24 +1,33 @@
 #include "myview.h"
 #include <qdebug.h>
 #include <QMouseEvent>
-myView::myView(QWidget *parent) :
+#include <QMovie>
+myView::myView(QWidget *parent, mainGame *rMG) :
     QGraphicsView(parent)
 {
+
+    //Set the sun index
+    sunIndex = 0;
+    //Load the grass images.
     grass1.load(":/grass1/darkGrass.PNG");
     grass2.load(":/grass2/lightGrass.PNG");
     //Set up the game board.
-    WIDTH = parent->width() -10;
-    HEIGHT = parent->height() - 5;
+    WIDTH = parent->width();
+    HEIGHT = parent->height();
+    //Set up the scene
     scene = new QGraphicsScene(this);
     setScene(scene);
+
+    //Set the main game object to the maingame
+    mG = rMG;
 
     //Set the size of hte screen.
     QRectF rect(0,0,WIDTH,HEIGHT);
     setSceneRect(rect);
 
+    //Get the games block height/width relative to the window height/width
     gameBlockHeight = HEIGHT/ROWS;
     gameBlockWidth = WIDTH/COLUMNS;
-    QPen myPen = QPen(Qt::red);
 
     //Set up intial step counters
     int widthStep = 0;
@@ -69,6 +78,15 @@ int myView::random(int x1, int x2)
     return qrand() % ((x2 + 1) - x1) + x1;
 }
 
+//Accept the plant the user wants to plant next
+void myView::acceptPlant(Plant *rPlant)
+{
+    //Get the plants pixmap
+    QPixmap tempPix = rPlant->pixmap();
+    //Create the pixmapItem
+    item = new QGraphicsPixmapItem(tempPix);
+}
+
 void myView::sunSpawn()
 {
     //Add a new sun.
@@ -78,15 +96,43 @@ void myView::sunSpawn()
     scene->addItem(*sunIter);
 }
 
+//This is called whenever the user clicks on the screen.
 void myView::mousePressEvent(QMouseEvent *event)
 {
     int range = Sun::W;
     QPointF tempPoint = event->pos();
-    //Iterate through all the current suns.
-    for(sunIter = suns.begin(); sunIter != suns.end(); sunIter++){
-        //If the user clicks within the range of the sun...
-        if((qAbs(tempPoint.x() - (*(*sunIter)).getLocation().x()) <= range) && (qAbs(tempPoint.y() - (*(*sunIter)).getLocation().y()) <= range)){
-            qDebug() << "Sun!" << endl;
+    if(mG->isPlantSelected){
+        for(int i = 0; i < ROWS; i ++){
+            for(int j = 0; j < COLUMNS; j++){
+                //If the user clicks within a grid item AND that grid item isnt filled...
+                if(grid[i][j].contains(event->pos()) && !gridFill[i][j]){
+                    //Set the item position to the center of the grid.
+                    item->setPos(grid[i][j].topLeft());
+                    //Add the item to the scene.
+                    scene->addItem(item);
+                    gridFill[i][j] = true; //This grid space is now occupied.
+                    mG->removeSunPoints(); // remove the sun points for this plant.
+                }
+            }
+        }
+
+    }else{
+        //Itterate through all the current suns
+        for(sunIter = suns.begin(); sunIter != suns.end();){
+            //If the user clicks within the range of the sun...
+            if((qAbs(tempPoint.x() - (*(*sunIter)).getLocation().x()) <= range) && (qAbs(tempPoint.y() - (*(*sunIter)).getLocation().y()) <= range)){
+                //Delete the sun the user  clicks on
+                delete *sunIter;
+                //Erase the sun from the vector.
+                sunIter = suns.erase(sunIter);
+                //decrement the sun index as a sun was just removed.
+                sunIndex --;
+                //Add the sun points.
+                mG->addSunPoints();
+            }else{
+                //Increase the sunIterator if no sun was removed.
+                sunIter ++;
+            }
         }
     }
 

@@ -8,4 +8,7 @@
     <qresource prefix="/sun">
         <file>Sun.png</file>
     </qresource>
+    <qresource prefix="/Sunflower">
+        <file>Sunflower.gif</file>
+    </qresource>
 </RCC>
