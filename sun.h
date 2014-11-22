@@ -11,15 +11,17 @@
 class Sun : public QGraphicsPixmapItem
 {
 public:
-    Sun(int row, int column);
-    Sun(QPointF rPoint);
+    Sun(int row, int column, bool falling);
 
     QPointF p;
     QPointF sunLocation;
     QPixmap sunPix;
+
+    bool isFalling;
     enum {W= 35};
     void advance(int phase);
     void setLocation(int rX, int rY);
+    void setLocation(QPointF rLoc);
     QPointF getLocation();
     int endRow;
 

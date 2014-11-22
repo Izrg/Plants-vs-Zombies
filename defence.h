@@ -17,6 +17,10 @@ protected:
     // Plant interface
 public:
     QString getImagePath();
+
+    // Plant interface
+public:
+    void onPlant();
 };
 
 #endif // DEFENCE_H

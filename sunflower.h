@@ -1,21 +1,22 @@
 #ifndef SUNFLOWER_H
 #define SUNFLOWER_H
 #include <defence.h>
+#include <maingame.h>
 #include <QMovie>
 #include <sun.h>
 
-class myView;
 class Sunflower : public Defence
 {
 public:
-    Sunflower();
-    void makeSun();
-    myView *mV;
-    QTimer *sunflowerTimer;
-
+    Sunflower(myView *rMV = 0);
     // Plant interface
 public:
     QString getImagePath();
+
+
+    // Plant interface
+public:
+    void onPlant();
 };
 
 #endif // SUNFLOWER_H

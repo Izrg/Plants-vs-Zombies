@@ -9,3 +9,8 @@ QString Defence::getImagePath()
 {
 
 }
+
+void Defence::onPlant()
+{
+
+}

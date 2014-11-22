@@ -10,15 +10,15 @@ using namespace std;
 #include <mainwindow.h>
 #include <QWidget>
 #include <vector>
-#include <plant.h>
 #include <QPushButton>
+#include <QSignalMapper>
 
 namespace Ui {
 class mainGame;
 }
 class MainWindow;
 class myView;
-
+class Plant;
 class mainGame : public QMainWindow
 {
     Q_OBJECT
@@ -41,17 +41,14 @@ public:
     void checkPlants();
     ~mainGame();
     MainWindow *mW;
+    int random(int x1, int x2);
 
 private slots:
     void on_sunflowerBtn_clicked();
-
-
     void on_peashooterBtn_clicked();
 
 private:
 
-    QTimer *moveTimer;
-    QTimer *sunTimer;
 
 
 

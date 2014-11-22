@@ -17,7 +17,6 @@
 #include <QMouseEvent>
 #include <QGraphicsView>
 #include <QPushButton>
-
 QGraphicsView *gB;
 QLabel *sunPointsLbl;
 QPushButton *sunFlowerBtn;
@@ -49,18 +48,6 @@ mainGame::mainGame(QWidget *parent) :
     //Initialize the sunpoints label
     sunPointsLbl->setText("Sun Points: 500");
 
-    //Set up the timers
-    moveTimer = new QTimer(this);
-    sunTimer = new QTimer(this);
-
-
-    //Start the move timer to control movement.
-    connect(moveTimer, SIGNAL(timeout()), mV->scene, SLOT(advance()));
-    //Start the sun timer, which controls when suns spawn.
-    connect(sunTimer, SIGNAL(timeout()), mV, SLOT(sunSpawn()));
-    //Initiate the timers.
-    sunTimer->start(10000);
-    moveTimer->start(100);
 
 }
 //Add sun points when the user clicks a sun.
@@ -88,7 +75,7 @@ void mainGame::removeSunPoints(int rPoints)
     sunPointsLbl->setText(QString("Sun Points: %1").arg(sunPoints));
 
 }
-
+//Return the plant the user wants to make.
 Plant *mainGame::getPlant()
 {
     return pObj;
@@ -118,11 +105,16 @@ mainGame::~mainGame()
     delete ui;
 }
 
+int mainGame::random(int x1, int x2)
+{
+
+}
+
 void mainGame::on_sunflowerBtn_clicked()
 {
     isPlantSelected = true;
     //Add the new sunflower to the plants vector.
-    pObj = new Sunflower(); // Create the new sunFlower.
+    pObj = new Sunflower(mV); // Create the new sunFlower.
     //Sets up the cursor for the new plant.
     const QPixmap tempPix(":/Sunflower/Sunflower.gif"); // Get the sunflower image.
     tempPix.scaled(W,W); // Scale the image to desired size
@@ -130,7 +122,6 @@ void mainGame::on_sunflowerBtn_clicked()
     //Set the cursor to the plant.
     const QCursor tempCurs(tempPix);
     QWidget::setCursor(tempCurs);
-
 }
 
 void mainGame::keyPressEvent(QKeyEvent *mouseEvent)
@@ -138,6 +129,7 @@ void mainGame::keyPressEvent(QKeyEvent *mouseEvent)
     switch(mouseEvent->key()){
         case Qt::Key_Escape:
             if(isPlantSelected){
+                delete pObj;
                 //Reset the cursor
                 QWidget::setCursor(Qt::ArrowCursor);
                 //sets the plant selected to false.
@@ -152,7 +144,7 @@ void mainGame::keyPressEvent(QKeyEvent *mouseEvent)
 void mainGame::on_peashooterBtn_clicked()
 {
     isPlantSelected = true;
-    pObj = new Peashooter(); // Create the new peaShooter.
+    pObj = new Peashooter(mV); // Create the new peaShooter.
     //Sets up the cursor for the new plant.
     const QPixmap tempPix(":/Plants/PeaShooter.gif");
     tempPix.scaled(W,W); // Scale the image to desired size

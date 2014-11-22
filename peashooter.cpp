@@ -1,6 +1,6 @@
 #include "peashooter.h"
 
-Peashooter::Peashooter()
+Peashooter::Peashooter(myView *rMV)
 {
     //Set up the peashooter stats.
     this->cost = 100;
@@ -10,9 +10,17 @@ Peashooter::Peashooter()
     this->rate = 1.5;
     this->seeding = 7.5;
     this->slow = false;
+
+    mV = rMV;
+    rateTimer = new QTimer(mV);
 }
 
 QString Peashooter::getImagePath()
 {
     return ":/Plants/PeaShooter.gif";
+}
+
+void Peashooter::onPlant()
+{
+
 }

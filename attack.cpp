@@ -10,3 +10,8 @@ QString Attack::getImagePath()
 {
 
 }
+
+void Attack::onPlant()
+{
+
+}

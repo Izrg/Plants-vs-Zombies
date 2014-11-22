@@ -5,13 +5,17 @@
 class Peashooter : public Attack
 {
 public:
-    Peashooter();
-
+    Peashooter(myView *rMV = 0);
+    myView *mV;
 
 
     // Plant interface
 public:
     QString getImagePath();
+
+    // Plant interface
+public:
+    void onPlant();
 };
 
 #endif // PEASHOOTER_H

@@ -14,4 +14,7 @@
     <qresource prefix="/Plants">
         <file>PeaShooter.gif</file>
     </qresource>
+    <qresource prefix="/Zombies">
+        <file>Regular.gif</file>
+    </qresource>
 </RCC>

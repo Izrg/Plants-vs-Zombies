@@ -2,12 +2,12 @@
 #include <qdebug.h>
 #include <QMouseEvent>
 #include <QMovie>
+#include <QAction>
 myView::myView(QWidget *parent, mainGame *rMG) :
     QGraphicsView(parent)
 {
 
-    //Set the sun index
-    sunIndex = 0;
+
     //Load the grass images.
     grass1.load(":/grass1/darkGrass.PNG");
     grass2.load(":/grass2/lightGrass.PNG");
@@ -22,6 +22,38 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     mG = rMG;
 
     plantsIndex = 0; // Initilize the plants index to 0, no plants.
+    zombieIndex = 0; // Initilize the zombies index to 0, no zombies.
+    sunIndex = 0; //Initilize the sun index to 0, no suns.
+
+    //Set up the timers
+    moveTimer = new QTimer(this);
+    sunTimer = new QTimer(this);
+    zombieSpawnTimer = new QTimer(this);
+
+    maxZombies = 5; // Set the max number of zombies.
+    currentZombies = 0; // No zombies spawned yet.
+
+    //Start the move timer to control movement.
+    connect(moveTimer, SIGNAL(timeout()), this->scene, SLOT(advance()));
+
+
+    //QAction* a1 = new QAction(this);
+    mapper = new QSignalMapper(this);
+
+    //Start the sun timer, which controls when suns spawn.
+    connect(sunTimer, SIGNAL(timeout()), mapper, SLOT(map()));
+
+    mapper->setMapping(sunTimer,(QObject*)new QPointF(-1,-1));
+    connect(mapper,SIGNAL(mapped(QObject*)),this,SLOT(sunSpawn(QObject*)));
+
+    //Start the zombie timer, which controls when zombies spawn.
+    connect(zombieSpawnTimer, SIGNAL(timeout()),this,SLOT(zombieSpawner()));
+
+    //Initiate the timers.
+    sunTimer->start(10000);
+    moveTimer->start(100);
+    zombieSpawnTimer->start(5000);
+
     //Set the size of hte screen.
     QRectF rect(0,0,WIDTH,HEIGHT);
     setSceneRect(rect);
@@ -64,7 +96,7 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     }
 
     //Add an initial sun and add it to the scene.
-    suns.push_back(new Sun(((this->random(0,ROWS-1))*gameBlockHeight +(gameBlockHeight/4)),(this->random(0,COLUMNS-1)*gameBlockWidth + (gameBlockWidth/4))));
+    suns.push_back(new Sun(((this->random(0,ROWS-1))*gameBlockHeight +(gameBlockHeight/4)),(this->random(0,COLUMNS-1)*gameBlockWidth + (gameBlockWidth/4)),true));
     sunIter = suns.begin() + sunIndex;
     sunIndex ++;
     scene->addItem(*sunIter);
@@ -76,25 +108,12 @@ int myView::random(int x1, int x2)
     return qrand() % ((x2 + 1) - x1) + x1;
 }
 
-//Accept the plant the user wants to plant next
-void myView::acceptPlant(Plant *rPlant)
-{
-      //TODO: //Trying to put a gif into the graphicsview.
-//    plantLabel = new QLabel();
-//    plantGif = new QMovie(mG->plantImagePath);
-//    plantLabel->setMovie(plantGif);
-//    plantGif->start();
-
-
-    //&pObj = (&rPlant); // Sets the plant Object to the received plant;
-}
-
 void myView::plantNewPlant()
 {
-
     //Pushes a new plant into the plants vector
     plants.push_back(mG->getPlant());
     plantsIter = plants.begin() + plantsIndex;
+    plantsIndex ++; // Increase plants index as a plant was just planted.
     //Loads the new plants pixmap
     QPixmap tempPix;
     tempPix.load((*plantsIter)->getImagePath());
@@ -103,25 +122,44 @@ void myView::plantNewPlant()
     (*plantsIter)->setImage(tempPix);
     //Create the pixmapItem
     item = new QGraphicsPixmapItem(tempPix);
+
 }
 
 //This is called on a timer to spawn suns throughout the game every 10s
-void myView::sunSpawn()
+void myView::sunSpawn(QObject *rPoint)
 {
+    QPointF* p = (QPointF*)rPoint;
+    int row, column;
+    bool falling;
+    //checks if the sun is falling or if it is being placed on a sunflower.
+    if(falling = (p->x() == -1)) p = new QPointF((this->random(0,ROWS-1)),(this->random(0,COLUMNS -1)));
+    row = p->x() * gameBlockHeight +(gameBlockHeight/4);
+    column = p->y() * gameBlockWidth + (gameBlockWidth/4);
+
     //Spawns a sun at a random column.
     //The sun then drops to a random row.
-    suns.push_back(new Sun(((this->random(0,ROWS-1))*gameBlockHeight +(gameBlockHeight/4)),(this->random(0,COLUMNS-1)*gameBlockWidth + (gameBlockWidth/4))));
+    suns.push_back(new Sun(row,column, falling));
     sunIter = suns.begin() + sunIndex;
     sunIndex ++;
     scene->addItem(*sunIter);
 }
-//This is called for sunflowers to spawn suns.
-void myView::sunflowerSunSpawn()
+
+//This is called to spawn zombies.
+void myView::zombieSpawner()
 {
-    suns.push_back(new Sun(item->pos()));
-    sunIter = suns.begin() + sunIndex;
-    sunIndex ++;
-    scene->addItem(*sunIter);
+    currentZombies ++; // One more zombie has spawned.
+    //If the max zombies hasnt been reached yet...
+    if(currentZombies <= maxZombies){
+        //Add a new zombie.
+        zombies.push_back(new Regular(((this->random(0,ROWS-1))*gameBlockHeight),COLUMNS *gameBlockWidth));
+        zombieIter = zombies.begin() + zombieIndex;
+        zombieIndex ++;
+        scene->addItem(*zombieIter);
+    }else{
+        return;
+    }
+
+
 }
 
 //This is called whenever the user clicks on the screen.
@@ -136,6 +174,8 @@ void myView::mousePressEvent(QMouseEvent *event)
                 //If the user clicks within a grid item AND that grid item isnt filled...
                 if(grid[i][j].contains(event->pos()) && !gridFill[i][j]){
                     plantNewPlant(); // Plant the new plant.
+                    (*plantsIter)->setPlantLocation(i,j); // Set the plants location.
+                    (*plantsIter)->onPlant(); // Initiate the on plant funciton.
                     //Set the item position to the center of the grid.
                     item->setPos(grid[i][j].topLeft());
                     //Add the item to the scene.
@@ -143,8 +183,8 @@ void myView::mousePressEvent(QMouseEvent *event)
                     //QGraphicsProxyWidget *proxy = scene->addWidget(plantLabel);
                     gridFill[i][j] = true; //This grid space is now occupied.
                     mG->removeSunPoints((*plantsIter)->getCost()); // remove the sun points for this plant.
-                    plantsIndex ++; // Increase plants index as a plant was just planted.
-                    //If the plant just planted has a "sun" value of true, start the sun planting timer.
+                    mG->isPlantSelected = false; // No more plant is selected.
+                    (*plantsIter)->rateTimer->start((*plantsIter)->getRate() * 100); // Start the plant rateTimer based on the plants rate.
                 }
             }
         }
