@@ -1,3 +1,4 @@
+#pragma once
 #include "mainwindow.h"
 #include <QApplication>
 #include <QTime>

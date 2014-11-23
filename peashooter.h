@@ -8,11 +8,11 @@ public:
     Peashooter(myView *rMV = 0);
     myView *mV;
 
+    void advance(int phase);
 
     // Plant interface
 public:
     QString getImagePath();
-
     // Plant interface
 public:
     void onPlant();

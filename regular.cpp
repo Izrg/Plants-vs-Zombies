@@ -15,18 +15,13 @@ Regular::Regular(int row, int column)
 
 
     //Stores the zombies current location.
-    setLocation(column,row);
+    setZombieLocation(column,row);
 
     //set the zombies position on the screen.
     setPos(column,row);
     setPixmap(regularPix);
 }
 
-void Regular::setLocation(int column, int row)
-{
-    regularLocation.setX(column);
-    regularLocation.setY(row);
-}
 void Regular::advance(int phase)
 {
 
@@ -35,7 +30,7 @@ void Regular::advance(int phase)
     //Move the sun down the scene.
     p = this->pos();
     //Change the location of the sun as it moves.
-    setLocation(p.x() - 1, p.y());
+    setZombieLocation(p.x() - 1, p.y());
     //Set the new location on the screen
     setPos(p.x() - 1, p.y());
 

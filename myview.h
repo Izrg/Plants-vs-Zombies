@@ -11,9 +11,11 @@
 #include <plant.h>
 #include <zombie.h>
 #include <regular.h>
+#include <grass.h>
 class QMouseEvent;
 class mainGame;
 class Plant;
+class Grass;
 class myView : public QGraphicsView
 {
     Q_OBJECT
@@ -49,8 +51,9 @@ public:
     QRectF grid[ROWS][COLUMNS];
     bool gridFill[ROWS][COLUMNS] = {{false}};
 
-    QPixmap grass1; // Grass texture 1
-    QPixmap grass2; // grass texture 2.
+
+    Grass *g1,*g2;
+
     QGraphicsPixmapItem *item; // Used to add items to the scene
     QMovie *plantItem; // Used to add plants to the scene.
 
@@ -65,7 +68,7 @@ public:
     void plantNewPlant();
 
 public slots:
-
+    void checkZombie(Plant*);
     void sunSpawn(QObject*);
     void zombieSpawner();
     // QWidget interface

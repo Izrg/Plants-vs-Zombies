@@ -7,10 +7,6 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     QGraphicsView(parent)
 {
 
-
-    //Load the grass images.
-    grass1.load(":/grass1/darkGrass.PNG");
-    grass2.load(":/grass2/lightGrass.PNG");
     //Set up the game board.
     WIDTH = parent->width();
     HEIGHT = parent->height();
@@ -42,7 +38,6 @@ myView::myView(QWidget *parent, mainGame *rMG) :
 
     //Start the sun timer, which controls when suns spawn.
     connect(sunTimer, SIGNAL(timeout()), mapper, SLOT(map()));
-
     mapper->setMapping(sunTimer,(QObject*)new QPointF(-1,-1));
     connect(mapper,SIGNAL(mapped(QObject*)),this,SLOT(sunSpawn(QObject*)));
 
@@ -66,29 +61,24 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     int widthStep = 0;
     int heightStep = 0;
     bool dark = true;
-
-   //This loop is used to draw the grid.
+    //g1 = new Grass(dark);
+    //g2 = new Grass(!dark);
+    //This loop is used to draw the grid.
     for(int i = 0; i < ROWS; i ++){
         for (int j = 0; j < COLUMNS; j++){
-            //Alternate between dark and light grass squares.
-            if(dark){
-                item = new QGraphicsPixmapItem(grass1);
-                dark = false;
-            }else {
-                item = new QGraphicsPixmapItem(grass2);
-                dark = true;
-            }
+            g1 = new Grass(dark);
+            dark = (!dark);
             //Set the new grid square.
             QRectF tempRect (widthStep,heightStep, gameBlockWidth, gameBlockHeight);
             //Add the new rectangle to the array to hold the grid.
             grid[i][j] = tempRect;
             //Add the grass texture to the grid.
-            item->setPos(widthStep,heightStep);
-            scene->addItem(item);
+            g1->setPos(widthStep,heightStep);
+            scene->addItem(g1);
             widthStep += gameBlockWidth;
 
         }
-        dark = !(dark);
+        dark = (!dark);
         //Move down a row based on the block height.
         heightStep += gameBlockHeight;
         //Reset the width step to start drawing at he left side of screen again.
@@ -120,9 +110,11 @@ void myView::plantNewPlant()
     tempPix.scaled(W,W); // Scale the image to desired size
     //Sets the new plants pixmap
     (*plantsIter)->setImage(tempPix);
-    //Create the pixmapItem
-    item = new QGraphicsPixmapItem(tempPix);
+}
 
+void myView::checkZombie(Plant *)
+{
+    qDebug() << "ZOMBIE TEST" << endl;
 }
 
 //This is called on a timer to spawn suns throughout the game every 10s
@@ -177,9 +169,10 @@ void myView::mousePressEvent(QMouseEvent *event)
                     (*plantsIter)->setPlantLocation(i,j); // Set the plants location.
                     (*plantsIter)->onPlant(); // Initiate the on plant funciton.
                     //Set the item position to the center of the grid.
-                    item->setPos(grid[i][j].topLeft());
-                    //Add the item to the scene.
-                    scene->addItem(item);
+                    //Add the plant to the scene
+                    ((Plant*)(*plantsIter))->setPos(grid[i][j].topLeft());
+                    scene->addItem(*plantsIter);
+
                     //QGraphicsProxyWidget *proxy = scene->addWidget(plantLabel);
                     gridFill[i][j] = true; //This grid space is now occupied.
                     mG->removeSunPoints((*plantsIter)->getCost()); // remove the sun points for this plant.
@@ -188,7 +181,7 @@ void myView::mousePressEvent(QMouseEvent *event)
                 }
             }
         }
-    //If the user is currently not planting a plant.
+        //If the user is currently not planting a plant.
     }else{
         //Itterate through all the current suns
         for(sunIter = suns.begin(); sunIter != suns.end();){

@@ -1,9 +1,12 @@
 #ifndef PLANT_H
 #define PLANT_H
-#include <QGraphicsPixmapItem>
+#pragma once
 #include <QTimer>
 #include <myview.h>
-class Plant : public QGraphicsPixmapItem
+#include <QDebug>
+#include <typeinfo>
+#include <pvz.h>
+class Plant : public PvZ
 {
 public:
     Plant();

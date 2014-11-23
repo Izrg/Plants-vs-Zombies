@@ -2,7 +2,7 @@
 
 Plant::Plant()
 {
-
+    gametype = 'P';
 }
 
 void Plant::setImage(QPixmap rPix)
@@ -40,4 +40,9 @@ void Plant::setPlantLocation(int row, int column)
 {
     plantLocation.setX(row);
     plantLocation.setY(column);
+}
+
+void Plant::rateFunc()
+{
+
 }

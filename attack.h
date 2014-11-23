@@ -2,6 +2,7 @@
 #define ATTACK_H
 #include <plant.h>
 #include <myview.h>
+#include <QRect>
 class Attack : public Plant
 {
 public:
@@ -9,7 +10,8 @@ public:
 
 protected:
     bool slow;
-
+    bool zombieInRange;
+    QRectF* rangeRect;
 
     // Plant interface
 public:
@@ -18,6 +20,9 @@ public:
     // Plant interface
 public:
     void onPlant();
+
+public slots:
+    void advance(int phase);
 };
 
 #endif // ATTACK_H

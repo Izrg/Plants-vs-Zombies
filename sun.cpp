@@ -4,6 +4,8 @@
 #include <QDebug>
 Sun::Sun(int row, int column, bool falling)
 {
+    gametype = 'S';
+    name = "Sun";
     //Is the sun falling or not?
     isFalling = falling;
     //Load sun image, and make it WxW

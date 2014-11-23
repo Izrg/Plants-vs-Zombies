@@ -1,6 +1,6 @@
 #ifndef SUN_H
 #define SUN_H
-#include <QGraphicsPixmapItem>
+#include <pvz.h>
 #include <QPixmap>
 #include <QPoint>
 #include <QGraphicsObject>
@@ -8,7 +8,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 
-class Sun : public QGraphicsPixmapItem
+class Sun : public PvZ
 {
 public:
     Sun(int row, int column, bool falling);

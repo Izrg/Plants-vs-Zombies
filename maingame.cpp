@@ -118,7 +118,6 @@ void mainGame::on_sunflowerBtn_clicked()
     //Sets up the cursor for the new plant.
     const QPixmap tempPix(":/Sunflower/Sunflower.gif"); // Get the sunflower image.
     tempPix.scaled(W,W); // Scale the image to desired size
-    //Send the new plant to the myView class
     //Set the cursor to the plant.
     const QCursor tempCurs(tempPix);
     QWidget::setCursor(tempCurs);
