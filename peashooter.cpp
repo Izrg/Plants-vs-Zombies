@@ -23,7 +23,6 @@ void Peashooter::onPlant()
 {
 
     rangeRect = new QRectF(this->getPlantLocation().x(),this->getPlantLocation().y(),this->range,mV->gameBlockHeight);
-    qDebug() << "This range Rect: " << rangeRect << endl;
 //    mV->connect(rateTimer, SIGNAL(timeout()), mV->mapper, SLOT(map()));
 //    mV->mapper->setMapping(rateTimer,);
 //    mV->connect(mapper,SIGNAL(mapped(Plant*)),mV,SLOT(checkZombie(Plant*)));
@@ -33,8 +32,8 @@ void Peashooter::onPlant()
 void Peashooter::advance(int phase)
 {
     if(!phase) return;
-    for (int i = 0; i < mV->scene->collidingItems(this).size(); i++)
-        qDebug() << ((PvZ*)mV->scene->collidingItems(this).at(i))->gametype << " : " << i << endl;
+//    for (int i = 0; i < mV->scene->collidingItems(this).size(); i++)
+//        qDebug() << ((PvZ*)mV->scene->collidingItems(this).at(i))->gametype << " : " << i << endl;
 //   for(mV->zombieIter = mV->zombies.begin(); mV->zombieIter != mV->zombies.end();){
 //        if(rangeRect->contains((*(mV->zombieIter))->getZombieLocation())){
 //            qDebug() << "IN RANGE!!" << endl;

@@ -35,6 +35,7 @@ myView::myView(QWidget *parent, mainGame *rMG) :
 
     //QAction* a1 = new QAction(this);
     mapper = new QSignalMapper(this);
+    zombieMapper = new QSignalMapper(this);
 
     //Start the sun timer, which controls when suns spawn.
     connect(sunTimer, SIGNAL(timeout()), mapper, SLOT(map()));
@@ -112,11 +113,6 @@ void myView::plantNewPlant()
     (*plantsIter)->setImage(tempPix);
 }
 
-void myView::checkZombie(Plant *)
-{
-    qDebug() << "ZOMBIE TEST" << endl;
-}
-
 //This is called on a timer to spawn suns throughout the game every 10s
 void myView::sunSpawn(QObject *rPoint)
 {
@@ -136,6 +132,37 @@ void myView::sunSpawn(QObject *rPoint)
     scene->addItem(*sunIter);
 }
 
+void myView::zombieEat(QObject *rPlant)
+{
+    QPointF* p = (QPointF*)rPlant;
+
+    for(plantsIter = plants.begin(); plantsIter != plants.end();plantsIter ++){
+        //Check for which plant is being eaten
+        if(((Plant*)(*plantsIter))->pos() == *p){
+            ((Plant*)(*plantsIter))->setLife((((Plant*)(*plantsIter))->getLife()) - 1);
+        }
+        //if the plants life is 0
+        if((Plant*)(*plantsIter)->getLife() <= 0){
+            for(int i = 0; i < ROWS; i ++){
+                for(int j = 0; j < COLUMNS; j++){
+                    //make the grid section the plant was on free to be planted on again.
+                    if(grid[i][j].contains(((Plant*)(*plantsIter))->pos())){
+                        gridFill[i][j] = false; //This grid space is now free to be planted in
+                    }
+                }
+            }
+            //Delete the plant and remove it from the vector
+            delete *plantsIter;
+            plantsIter = plants.erase(plantsIter);
+            //Decrement plant index
+            plantsIndex --;
+
+            return;
+        }
+    }
+    //qDebug() << "Plant Health : " << tempPlant->getLife() << endl;
+}
+
 //This is called to spawn zombies.
 void myView::zombieSpawner()
 {
@@ -143,7 +170,7 @@ void myView::zombieSpawner()
     //If the max zombies hasnt been reached yet...
     if(currentZombies <= maxZombies){
         //Add a new zombie.
-        zombies.push_back(new Regular(((this->random(0,ROWS-1))*gameBlockHeight),COLUMNS *gameBlockWidth));
+        zombies.push_back(new Regular(((this->random(0,ROWS-1))*gameBlockHeight),COLUMNS *gameBlockWidth,this));
         zombieIter = zombies.begin() + zombieIndex;
         zombieIndex ++;
         scene->addItem(*zombieIter);
@@ -172,8 +199,6 @@ void myView::mousePressEvent(QMouseEvent *event)
                     //Add the plant to the scene
                     ((Plant*)(*plantsIter))->setPos(grid[i][j].topLeft());
                     scene->addItem(*plantsIter);
-
-                    //QGraphicsProxyWidget *proxy = scene->addWidget(plantLabel);
                     gridFill[i][j] = true; //This grid space is now occupied.
                     mG->removeSunPoints((*plantsIter)->getCost()); // remove the sun points for this plant.
                     mG->isPlantSelected = false; // No more plant is selected.

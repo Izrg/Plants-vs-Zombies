@@ -1,5 +1,4 @@
 #include "zombie.h"
-
 Zombie::Zombie()
 {
     gametype = 'Z';

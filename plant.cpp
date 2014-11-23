@@ -31,6 +31,16 @@ double Plant::getRate()
     return rate;
 }
 
+int Plant::getLife()
+{
+    return life;
+}
+
+void Plant::setLife(int newLife)
+{
+    life = newLife;
+}
+
 QPointF Plant::getPlantLocation()
 {
     return plantLocation;

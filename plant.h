@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <typeinfo>
 #include <pvz.h>
+
 class Plant : public PvZ
 {
 public:
@@ -17,6 +18,8 @@ public:
     QTimer *rateTimer;
     int getCost();
     double getRate();
+    int getLife();
+    void setLife(int newLife);
     QPointF getPlantLocation();
     void setPlantLocation(int row, int column);
 

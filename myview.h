@@ -9,13 +9,13 @@
 #include <sun.h>
 #include <QPushButton>
 #include <plant.h>
-#include <zombie.h>
 #include <regular.h>
 #include <grass.h>
 class QMouseEvent;
 class mainGame;
 class Plant;
 class Grass;
+class Zombie;
 class myView : public QGraphicsView
 {
     Q_OBJECT
@@ -58,7 +58,7 @@ public:
     QMovie *plantItem; // Used to add plants to the scene.
 
     QSignalMapper* mapper; //For mapping signals -> let's us pass values to slots
-
+    QSignalMapper* zombieMapper; //For mapping signals -> let's us pass values to slots
     //Variables to control the height and width of each grid block.
     int WIDTH, HEIGHT;
     int gameBlockHeight, gameBlockWidth;
@@ -68,8 +68,8 @@ public:
     void plantNewPlant();
 
 public slots:
-    void checkZombie(Plant*);
     void sunSpawn(QObject*);
+    void zombieEat(QObject*);
     void zombieSpawner();
     // QWidget interface
 protected:

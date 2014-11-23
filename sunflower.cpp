@@ -19,6 +19,11 @@ Sunflower::Sunflower(myView *rMV)
 
 }
 
+Sunflower::~Sunflower()
+{
+    rateTimer->stop();
+}
+
 QString Sunflower::getImagePath()
 {
     return ":/Sunflower/Sunflower.gif";

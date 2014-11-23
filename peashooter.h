@@ -6,8 +6,6 @@ class Peashooter : public Attack
 {
 public:
     Peashooter(myView *rMV = 0);
-    myView *mV;
-
     void advance(int phase);
 
     // Plant interface
