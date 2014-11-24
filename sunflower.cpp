@@ -1,9 +1,7 @@
-#include "sunflower.h"
-#include "sun.h"
+#include "ref.h"
+
 Sunflower::Sunflower(myView *rMV)
 {
-
-
     //Set up all the attributes of thhe plant.
     this->cost = 50;
     this->life = 4;
@@ -17,6 +15,8 @@ Sunflower::Sunflower(myView *rMV)
     mV = rMV;
     rateTimer = new QTimer(mV);
 
+    name = "Sunflower";
+    setPixmap(QPixmap(":/Sunflower/Sunflower.gif"));
 }
 
 Sunflower::~Sunflower()
@@ -32,6 +32,6 @@ QString Sunflower::getImagePath()
 void Sunflower::onPlant()
 {
     mV->connect(rateTimer, SIGNAL(timeout()), mV->mapper, SLOT(map()));
-    mV->mapper->setMapping(rateTimer,(QObject*)new QPointF(getPlantLocation()));
+    mV->mapper->setMapping(rateTimer,(QObject*)new QPointF(instances->back()->pos()));
     rateTimer->start(this->getRate() * 3000);
 }

@@ -1,9 +1,10 @@
+#pragma once
 #ifndef SUNFLOWER_H
 #define SUNFLOWER_H
-#include <defence.h>
-#include <QMovie>
-#include <sun.h>
 
+#include "defence.h"
+
+class myView;
 class Sunflower : public Defence
 {
 public:

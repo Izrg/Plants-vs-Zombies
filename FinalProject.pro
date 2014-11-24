@@ -39,7 +39,8 @@ HEADERS  += mainwindow.h \
     zombie.h \
     regular.h \
     pvz.h \
-    grass.h
+    grass.h \
+    ref.h
 
 FORMS    += mainwindow.ui \
     maingame.ui

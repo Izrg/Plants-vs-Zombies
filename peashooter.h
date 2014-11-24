@@ -1,7 +1,10 @@
+#pragma once
 #ifndef PEASHOOTER_H
 #define PEASHOOTER_H
-#include <attack.h>
 
+#include "attack.h"
+
+class myView;
 class Peashooter : public Attack
 {
 public:

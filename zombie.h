@@ -1,23 +1,28 @@
 #ifndef ZOMBIE_H
 #define ZOMBIE_H
-#include <pvz.h>
+#pragma once
+
+#include "pvz.h"
+
 #include <QTimer>
+#include <QList>
 
 class Zombie : public PvZ
 {
 public:
     Zombie();
-    QPointF getZombieLocation();
-    void setZombieLocation(int column, int row);
+    void onSpawn();
+
     QTimer *eatTimer;
+
+    QList<int>* instanceLife;
+
 protected:
     int zombieLife;
     int equipmentLife;
     int attack;
     double rate;
     double speed;
-    QPointF zombieLocation;
-
 };
 
 #endif // ZOMBIE_H

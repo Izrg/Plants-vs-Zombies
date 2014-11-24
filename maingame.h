@@ -1,17 +1,18 @@
-using namespace std;
+#pragma once
 #ifndef MAINGAME_H
 #define MAINGAME_H
+
+#include <QObject>
 #include <QMainWindow>
-#include <QGraphicsScene>
-#include <Qpixmap>
-#include <QLabel>
-#include <QPainter>
-#include <QTimer>
-#include <mainwindow.h>
 #include <QWidget>
-#include <vector>
-#include <QPushButton>
 #include <QSignalMapper>
+#include <QToolButton>
+#include <QList>
+#include <QKeyEvent>
+
+#include "mainwindow.h"
+#include "myview.h"
+#include "ref.h"
 
 namespace Ui {
 class mainGame;
@@ -26,33 +27,33 @@ class mainGame : public QMainWindow
 public:
 
     explicit mainGame(QWidget *parent = 0);
-    enum {W= 50}; // Used for the size of the plant pictures.
+    enum {W = 50}; // Used for the size of the plant pictures.
     Ui::mainGame *ui;
 
-    Plant *pObj;
+    //List for Plant Parent Classes
+    QList <Plant*> *plantObj;
 
-    //Bool to check if the user has selected a plant.
-    bool isPlantSelected;
+    //List for Buttons
+    QList <QToolButton*> *buttons;
+
+    //integer value to reference plant selection ; -1 if NULL.
+    int  plantSelected;
+
+    //Sun Points
+    int SunPoints;
 
     myView *mV; // delcare the myView object.
     void addSunPoints(); // Called to add sunpoints when a sun is clicked.
     void removeSunPoints(int rPoints); // Called to reset the cursor/subtrack the plants cost after a plant was planted.
-    Plant *getPlant();
     void checkPlants();
     ~mainGame();
     MainWindow *mW;
-    int random(int x1, int x2);
 
-private slots:
-    void on_sunflowerBtn_clicked();
-    void on_peashooterBtn_clicked();
+    QSignalMapper* mapper; //For mapping signals -> Allows passing of values to SLOTs
 
-private:
+public slots:
+    void onPlantButtonClicked(int);
 
-
-
-
-    // QWidget interface
 protected:
     void keyPressEvent(QKeyEvent *mouseEvent);
 };

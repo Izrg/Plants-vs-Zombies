@@ -1,24 +1,14 @@
-#include "plant.h"
+#include "ref.h"
 
 Plant::Plant()
 {
     gametype = 'P';
-}
-
-void Plant::setImage(QPixmap rPix)
-{
-    rPix = rPix.scaled(W,W);
-    setPixmap(rPix);
-}
-
-QString Plant::getImagePath()
-{
-
+    instanceLife = new QList<int>();
 }
 
 void Plant::onPlant()
 {
-
+    instanceLife->append(life);
 }
 
 int Plant::getCost()
@@ -41,18 +31,7 @@ void Plant::setLife(int newLife)
     life = newLife;
 }
 
-QPointF Plant::getPlantLocation()
-{
-    return plantLocation;
-}
-
-void Plant::setPlantLocation(int row, int column)
-{
-    plantLocation.setX(row);
-    plantLocation.setY(column);
-}
-
 void Plant::rateFunc()
 {
-
+    //
 }

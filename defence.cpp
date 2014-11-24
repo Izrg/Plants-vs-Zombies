@@ -1,11 +1,6 @@
-#include "defence.h"
+#include "ref.h"
 
 Defence::Defence()
-{
-
-}
-
-QString Defence::getImagePath()
 {
 
 }

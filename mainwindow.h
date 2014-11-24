@@ -1,8 +1,13 @@
+#pragma once
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QObject>
 #include <QMainWindow>
-#include <maingame.h>
+#include <QWidget>
+
+#include "maingame.h"
+
 namespace Ui {
 class MainWindow;
 }

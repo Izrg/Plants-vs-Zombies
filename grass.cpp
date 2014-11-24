@@ -1,16 +1,17 @@
-#include "grass.h"
+#include "ref.h"
 
 Grass::Grass()
 {
-}
-
-
-Grass::Grass(bool dark)
-{
-    QPixmap *pix;
-    if(dark) pix = new QPixmap(":/grass1/darkGrass.PNG");
-    else pix = new QPixmap(":/grass2/lightGrass.PNG");
-    setPixmap(*pix);
+    otherGrass = new QPixmap(":/grass2/lightGrass.PNG");
+    setPixmap(QPixmap(":/grass1/darkGrass.PNG"));
+    //pixmap().load(":/grass1/darkGrass.PNG");
     gametype = 'G';
     name = "Grass";
+}
+
+QPixmap* Grass::getGrass(bool dark)
+{
+    QPixmap tempPix = this->pixmap();
+    if(dark) return &tempPix;
+    return otherGrass;
 }

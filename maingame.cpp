@@ -1,102 +1,98 @@
-#include "maingame.h"
-#include "ui_maingame.h"
-#include "sunflower.h"
-#include "peashooter.h"
-#include <mainwindow.h>
-#include <sun.h>
-#include <myview.h>
-#include <qdebug.h>
-#include <QGraphicsScene>
-#include <Qpixmap>
-#include <QPainter>
-#include <QGraphicsPixmapItem>
-#include <vector>
-#include <QtGlobal>
-#include <QTime>
 #include <QDebug>
 #include <QMouseEvent>
-#include <QGraphicsView>
-#include <QPushButton>
-QGraphicsView *gB;
-QLabel *sunPointsLbl;
-QPushButton *sunFlowerBtn;
-QPushButton *peaShooterBtn;
+#include <QLayout>
 
-static int sunPoints = 500; // Initilize the sun points.
+#include "maingame.h"
+#include "ui_maingame.h"
+#include "mainwindow.h"
+#include "myview.h"
 
 mainGame::mainGame(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::mainGame)
 {
+    //Set UI
     ui->setupUi(this);
+
+    //Add the Gameboard
     mV = new myView(ui->gameBoard,this);
 
-    //Set up the points label.
-    sunPointsLbl = ui->sunPointsLbl;
-    //Set up the sunflower
-    sunFlowerBtn = ui->sunflowerBtn;
-    //Set up the pea shooter
-    peaShooterBtn = ui->peashooterBtn;
+    //Initialize Game Objects
+    plantObj = new QList<Plant*>();
 
-    //Initialize to false since no plant is selected.
-    isPlantSelected = false;
+    plantObj->append(new Sunflower(mV));
+    plantObj->append(new Peashooter(mV));
 
-    //Initially disable the buttons
-    sunFlowerBtn->setEnabled(false);
-    peaShooterBtn->setEnabled(false);
+    buttons = new QList<QToolButton*>();
 
-    //Initialize the sunpoints label
-    sunPointsLbl->setText("Sun Points: 500");
+    mapper = new QSignalMapper(this);
 
+    for (int i = 0; i < plantObj->size(); i++)
+    {
+        //Set up a Plant Button
+        buttons->append(new QToolButton());
+        buttons->back()->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+        buttons->back()->setText(plantObj->at(i)->name);
+        buttons->back()->setFixedHeight(91);
+        buttons->back()->setFixedWidth(71);
+        buttons->back()->setAutoFillBackground(true);
+        buttons->back()->setIcon(QIcon(plantObj->at(i)->pixmap()));
+        buttons->back()->setIconSize(QSize(W,W));
+        buttons->back()->setToolTip(plantObj->at(i)->name);
+        buttons->back()->setEnabled(false);
 
+        //Map the Button onClick()
+        connect(buttons->back(), SIGNAL(clicked()), mapper, SLOT(map()));
+        mapper->setMapping(buttons->back(), i);
+
+        //Add it to the UI
+        ui->horizontalLayout->addWidget(buttons->back());
+    }
+    connect(mapper, SIGNAL(mapped(int)), this, SLOT(onPlantButtonClicked(int)));
+    //Add a nice spacer to pretty things up
+    QSpacerItem *item = new QSpacerItem(1,1, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    ui->horizontalLayout->addSpacerItem(item);
+
+    //Initialize to "false" since no plant is selected.
+    plantSelected = -1;
+
+    //Initialize Sunpoints
+    SunPoints = 500;
+    ui->sunPointsLbl->setText(QString("Sun Points: %1").arg(SunPoints));
+
+    //Setup active Plant Buttons
+    checkPlants();
 }
 //Add sun points when the user clicks a sun.
 void mainGame::addSunPoints()
 {
     //Add 25 sun points.
-    sunPoints += 25;
+    SunPoints += 25;
     //Change the text of the sunPointsLbl.
-    sunPointsLbl->setText(QString("Sun Points: %1").arg(sunPoints));
+    ui->sunPointsLbl->setText(QString("Sun Points: %1").arg(SunPoints));
     //Check which plants can now be planted with the new sun points.
-    this->checkPlants();
+    checkPlants();
 }
 //removes sun points after a user clicks a sun.
 void mainGame::removeSunPoints(int rPoints)
 {
     //remove the cost of the plant just planted.
-    sunPoints -= rPoints;
+    SunPoints -= rPoints;
     //check which plants can now be planted with the new sun points.
-    this->checkPlants();
-    //No plant is selected.
-    isPlantSelected = false;
-    //Reset the cursor.
-    QWidget::setCursor(Qt::ArrowCursor);
-    //Change the text of the sunpointslbl
-    sunPointsLbl->setText(QString("Sun Points: %1").arg(sunPoints));
+    checkPlants();
 
-}
-//Return the plant the user wants to make.
-Plant *mainGame::getPlant()
-{
-    return pObj;
+    //Change the text of the sunpointslbl
+    ui->sunPointsLbl->setText(QString("Sun Points: %1").arg(SunPoints));
 }
 
 void mainGame::checkPlants()
 {
-
-    //Enable all plants that cost 50
-    if(sunPoints >= 50){
-        sunFlowerBtn->setEnabled(true);
-    }else{
-        //Else set them all to false
-        sunFlowerBtn->setEnabled(false);
-    }
-    //Enable all plants that cost at least 100
-    if(sunPoints >= 100){
-        peaShooterBtn->setEnabled(true);
-    }else{
-        //Else set them all to false.
-        peaShooterBtn->setEnabled(false);
+    for (int i = 0; i < plantObj->size(); i++)
+    {
+        if(plantObj->at(i)->getCost() <= SunPoints)
+        {
+            buttons->at(i)->setEnabled(true);
+        }
     }
 }
 
@@ -105,50 +101,32 @@ mainGame::~mainGame()
     delete ui;
 }
 
-int mainGame::random(int x1, int x2)
+void mainGame::onPlantButtonClicked(int index)
 {
+    //If clicking on the same Plant, put it back
+    if(plantSelected == index)
+    {
+        plantSelected = -1;
+        mV->QWidget::setCursor(Qt::ArrowCursor);
+        return;
+    }
 
-}
-
-void mainGame::on_sunflowerBtn_clicked()
-{
-    isPlantSelected = true;
-    //Add the new sunflower to the plants vector.
-    pObj = new Sunflower(mV); // Create the new sunFlower.
-    //Sets up the cursor for the new plant.
-    const QPixmap tempPix(":/Sunflower/Sunflower.gif"); // Get the sunflower image.
-    tempPix.scaled(W,W); // Scale the image to desired size
-    //Set the cursor to the plant.
-    const QCursor tempCurs(tempPix);
-    QWidget::setCursor(tempCurs);
+    //Note which Plant is selected
+    plantSelected = index;
+    mV->QWidget::setCursor(QCursor(plantObj->at(index)->pixmap()));
 }
 
 void mainGame::keyPressEvent(QKeyEvent *mouseEvent)
 {
     switch(mouseEvent->key()){
-        case Qt::Key_Escape:
-            if(isPlantSelected){
-                delete pObj;
-                //Reset the cursor
-                QWidget::setCursor(Qt::ArrowCursor);
-                //sets the plant selected to false.
-                isPlantSelected = false;
-                break;
-            }
+    case Qt::Key_Escape:
+        if(plantSelected != -1)
+        {
+            //Reset the cursor
+            mV->QWidget::setCursor(Qt::ArrowCursor);
+            //sets the plant selected to false.
+            plantSelected = -1;
+            break;
+        }
     }
-}
-
-
-//When the peashooter button is clicked, a peashooter icon will be prepped to be planted.
-void mainGame::on_peashooterBtn_clicked()
-{
-    isPlantSelected = true;
-    pObj = new Peashooter(mV); // Create the new peaShooter.
-    //Sets up the cursor for the new plant.
-    const QPixmap tempPix(":/Plants/PeaShooter.gif");
-    tempPix.scaled(W,W); // Scale the image to desired size
-    //Set the cursor to the plant.
-    const QCursor tempCurs(tempPix);
-    QWidget::setCursor(tempCurs);
-
 }

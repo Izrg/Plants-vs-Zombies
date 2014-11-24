@@ -1,12 +1,18 @@
+#pragma once
 #ifndef GRASS_H
 #define GRASS_H
-#include <pvz.h>
+
+#include <QPixmap>
+
+#include "pvz.h"
 
 class Grass : public PvZ
 {
 public:
-    Grass(bool);
     Grass();
+    QPixmap *getGrass(bool dark);
+private:
+    QPixmap* otherGrass;
 };
 
 #endif // GRASS_H

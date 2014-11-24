@@ -1,16 +1,11 @@
-#include "zombie.h"
+#include "ref.h"
 Zombie::Zombie()
 {
     gametype = 'Z';
+    instanceLife = new QList<int>();
 }
 
-QPointF Zombie::getZombieLocation()
+void Zombie::onSpawn()
 {
-    return zombieLocation;
-}
-
-void Zombie::setZombieLocation(int column, int row)
-{
-    zombieLocation.setX(column);
-    zombieLocation.setY(row);
+    instanceLife->append(zombieLife + equipmentLife);
 }
