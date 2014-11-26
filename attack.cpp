@@ -6,7 +6,7 @@ Attack::Attack()
 
 }
 
-void Attack::onPlant()
+void Attack::onPlant(myView *rMV)
 {
 
 }

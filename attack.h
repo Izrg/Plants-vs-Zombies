@@ -9,12 +9,11 @@ class Attack : public Plant
 {
 public:
     Attack();
-    void onPlant();
+    void onPlant(myView *rMV);
 
 public slots:
     void advance(int phase);
 
-protected:
     bool slow;
     bool zombieInRange;
     QRectF* rangeRect;

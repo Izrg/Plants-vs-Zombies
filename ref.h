@@ -21,9 +21,21 @@ public:
     char gametype;
     QString name;
 
+    const static int classType = 0;
+    const static int instanceLife = 1;
+    const static int rateIndex = 2;
+    const static int rowIndex = 3;
+    const static int columnIndex = 4;
+    const static int zombieType = 5;
+    const static int plantType = 6;
+    const static int instanceIndex = 7;
+    const static int damage = 8;
+
+
     myView *mV;
 
     QList<QGraphicsPixmapItem*>* instances;
+
 };
 
 class Grass : public PvZ
@@ -54,23 +66,22 @@ class Plant : public PvZ
 public:
     Plant();
 
-    void onPlant();
-
+    virtual void onPlant(myView *rMV);
+    QList<QTimer*>* timers;
     QTimer *rateTimer;
-
+    void advance(int phase);
     int getCost();
     double getRate();
     int getLife();
     void setLife(int newLife);
-
     bool inRange;
 
     QList<int>* instanceLife;
+    QList<int>* counter; // used to keep track of plant actions.
 
 public slots:
     void rateFunc();
 
-protected:
     int cost;
     int life;
     int range;
@@ -83,43 +94,55 @@ class Zombie : public PvZ
 {
 public:
     Zombie();
-    void onSpawn();
-
+    void onSpawn(myView *rMV);
+    int getAttack();
     QTimer *eatTimer;
-
     QList<int>* instanceLife;
+    QList<int>* counter;
 
-protected:
     int zombieLife;
     int equipmentLife;
     int attack;
     double rate;
     double speed;
+    GraphicsItemFlag isEating;
+    enum{COMMON_FACTOR = 10};
 };
 
 class Attack : public Plant
 {
 public:
     Attack();
-    void onPlant();
+    void onPlant(myView *rMV);
 
 public slots:
     void advance(int phase);
 
-protected:
     bool slow;
     bool zombieInRange;
     QRectF* rangeRect;
     QGraphicsItem *tempItem;
 };
 
+class Bullet : public PvZ
+{
+public:
+    Bullet(myView *rMV);
+    enum {W= 15};
+    int speed;
+public slots:
+    void advance(int phase);
+
+
+};
+
 class Defence : public Plant
 {
 public:
     Defence();
-    void onPlant();
+    void onPlant(myView *rMV);
+    void advance(int phase);
 
-protected:
     int splash;
     bool bomb;
     bool sun;
@@ -129,7 +152,8 @@ protected:
 class Sunflower : public Defence
 {
 public:
-    Sunflower(myView *rMV = 0);
+    Sunflower();
+    void advance(int phase);
     ~Sunflower();
     // Plant interface
 public:
@@ -138,13 +162,13 @@ public:
 
     // Plant interface
 public:
-    void onPlant();
+    void onPlant(myView *rMV);
 };
 
 class Peashooter : public Attack
 {
 public:
-    Peashooter(myView *rMV = 0);
+    Peashooter();
     void advance(int phase);
 
     // Plant interface
@@ -152,7 +176,7 @@ public:
     QString getImagePath();
     // Plant interface
 public:
-    void onPlant();
+    void onPlant(myView *rMV);
 };
 
 class Regular : public Zombie
@@ -160,7 +184,6 @@ class Regular : public Zombie
 public:
     Regular();
     Regular(myView *mV);
-
     enum{W=50}; //size for the zombie pixmap
 
     void advance(int phase); //advance function for the zombie.

@@ -13,6 +13,7 @@
     </qresource>
     <qresource prefix="/Plants">
         <file>PeaShooter.gif</file>
+        <file>Bullet.PNG</file>
     </qresource>
     <qresource prefix="/Zombies">
         <file>Regular.gif</file>

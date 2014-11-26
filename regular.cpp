@@ -3,25 +3,20 @@
 
 Regular::Regular()
 {
-
-}
-
-Regular::Regular(myView *rMV)
-{
     zombieLife = 10;
     equipmentLife = 0;
     attack = 1;
     rate = 0.5;
     speed = 5;
 
-
     //Load zombies image, and make it WxW
     setPixmap(QPixmap(":/Zombies/Regular.gif").scaled(W,W));
 
-    mV = rMV; // Sets the current mainview.
+    //mV = rMV; // Sets the current mainview.
 
-    eatTimer = new QTimer(mV);
+    //eatTimer = new QTimer(mV);
 }
+
 
 void Regular::advance(int phase)
 {
@@ -29,6 +24,18 @@ void Regular::advance(int phase)
 
     for (int i = 0; i < instances->size(); i++)
     {
+        if(instances->at(i)->flags().testFlag(QGraphicsItem::ItemIsMovable))
+        {
+            int tempInt = instances->at(i)->data(PvZ::rateIndex).toInt();
+            tempInt ++;
+            instances->at(i)->setData(PvZ::rateIndex,QVariant(tempInt));
+            //Check for rate of attack. TODO: SOME SERIOUS MATH!!
+            if(instances->at(i)->data(PvZ::rateIndex).toInt() % (int)(rate*50) == 1){
+                mV->zombieEat(instances->at(i)->data(PvZ::zombieType).toInt(),i);
+            }
+            continue;
+        }
+
         //Remove if offscreen
         if(instances->at(i)->pos().x() + pixmap().width() <= 0)
         {
@@ -39,34 +46,23 @@ void Regular::advance(int phase)
             continue;
         }
         //Move the zombie
-        instances->at(i)->setX(instances->at(i)->pos().x() - speed * 0.1);
-    }
+        instances->at(i)->setX(instances->at(i)->pos().x() - speed * 0.5);
+        //Chekc if the zombie hits a plant
+        //For each plant object....
 
-    /*
-    //Need to not check all the items in the scene.
-    for (int i = 0; i < mV->scene->collidingItems(this).size(); i++)
-    {
-        //If the zombie hits a plant, it starts to eat it.
-        if(((PvZ*)mV->scene->collidingItems(this).at(i))->gametype == 'P'){
-            if(eatTimer->isActive()){
+        //Go through each column of the current row.
+        for(int j = 0; j < mV->COLUMNS; j++)
+        {
+            //If there is no plant in the current column, continue.
+            if(mV->plantGrid[instances->at(i)->data(PvZ::rowIndex).toInt()][j] == NULL) continue;
+            //If the zombie collides with a plant, set a flag and return.
+            if(instances->at(i)->collidesWithItem(mV->plantGrid[instances->at(i)->data(PvZ::rowIndex).toInt()][j]))
+            {
+                //Set flag.
+                instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
                 return;
             }
-
-            mV->connect(eatTimer,SIGNAL(timeout()),mV->zombieMapper,SLOT(map()));
-            mV->zombieMapper->setMapping(eatTimer,(QObject*) new QPointF(mV->scene->collidingItems(this).at(i)->pos()));
-            mV->connect(mV->zombieMapper,SIGNAL(mapped(QObject*)),mV,SLOT(zombieEat(QObject*)));
-            eatTimer->start(3000);
-            return;
-
-        }else{
-            eatTimer->stop();
-            //Move the sun down the scene.
-            p = this->pos();
-            //Change the location of the sun as it moves.
-            setZombieLocation(p.x() - (this->speed * 0.1), p.y());
-            //Set the new location on the screen
-            setPos(p.x() - (this->speed * 0.1), p.y());
-
         }
-    }*/
+
+    }
 }

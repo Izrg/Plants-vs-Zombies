@@ -13,15 +13,16 @@ mainGame::mainGame(QWidget *parent) :
 {
     //Set UI
     ui->setupUi(this);
-
     //Add the Gameboard
-    mV = new myView(ui->gameBoard,this);
 
     //Initialize Game Objects
-    plantObj = new QList<Plant*>();
 
-    plantObj->append(new Sunflower(mV));
-    plantObj->append(new Peashooter(mV));
+    plantObj = new QList<Plant*>();
+    plantObj->append(new Sunflower());
+    plantObj->append(new Peashooter());
+
+    mV = new myView(ui->gameBoard,this);
+    mV->plantObj = plantObj;
 
     buttons = new QList<QToolButton*>();
 
@@ -103,6 +104,7 @@ mainGame::~mainGame()
 
 void mainGame::onPlantButtonClicked(int index)
 {
+
     //If clicking on the same Plant, put it back
     if(plantSelected == index)
     {

@@ -20,10 +20,12 @@
 class QMouseEvent;
 class mainGame;
 class Sun;
+class Bullet;
 class Grass;
 class Zombie;
 class Regular;
 class QGraphicsScene;
+class Plant;
 class myView : public QGraphicsView
 {
     Q_OBJECT
@@ -31,24 +33,32 @@ class myView : public QGraphicsView
 public:
     explicit myView(QWidget *parent = 0,mainGame *rMG = 0);
 
+    //List for Plant Parent Classes
+    QList <Plant*> *plantObj;
+
+
     //Lists for Zombies
     QList <Zombie*> *zombieObj; //Holds the "parent" class
     QList<QList<QGraphicsPixmapItem*>*> *zombieGridList; //Holds references to the children being drawn
-
     //Level Params ?
+
+
     int maxZombies; // Holds the max number of zombies for this level.
     int currentZombies; // Holds the number of zombies spawned so far.
 
     //Initilize Suns.
     Sun *sun;
+    //Initilize bullets.
+    Bullet *bullet;
 
     mainGame *mG; // mainGame forward declaration.
     QGraphicsScene *scene; // The graphics scene.
 
     enum {ROWS = 5, COLUMNS = 10};
+    enum{COMMON_FACTOR = 10}; // Common factor used between classes.
 
     QRectF grid[ROWS][COLUMNS];
-    bool gridFill[ROWS][COLUMNS];
+    QGraphicsPixmapItem *plantGrid [ROWS][COLUMNS];
 
     Grass *grass;
 
@@ -61,9 +71,11 @@ public:
     //Random number generator.
     int random(int x1, int x2);
 
+    void zombieEat(int,int); // Called when the zombie eats plant brains.
+    void plantShoot(int,int,bool);
+    void damageZombie(int,int,int);
 public slots:
     void sunSpawn(QObject*);
-    void zombieEat(QObject*);
     void zombieSpawner();
     // QWidget interface
 protected:

@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     zombie.cpp \
     regular.cpp \
     pvz.cpp \
-    grass.cpp
+    grass.cpp \
+    bullet.cpp
 
 HEADERS  += mainwindow.h \
     maingame.h \
@@ -40,7 +41,8 @@ HEADERS  += mainwindow.h \
     regular.h \
     pvz.h \
     grass.h \
-    ref.h
+    ref.h \
+    bullet.h
 
 FORMS    += mainwindow.ui \
     maingame.ui

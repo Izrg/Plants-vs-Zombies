@@ -6,9 +6,10 @@ Plant::Plant()
     instanceLife = new QList<int>();
 }
 
-void Plant::onPlant()
+void Plant::onPlant(myView *rMV)
 {
-    instanceLife->append(life);
+
+
 }
 
 int Plant::getCost()
@@ -31,7 +32,7 @@ void Plant::setLife(int newLife)
     life = newLife;
 }
 
-void Plant::rateFunc()
+void Plant::advance(int phase)
 {
-    //
+
 }

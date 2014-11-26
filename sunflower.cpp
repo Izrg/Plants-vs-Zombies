@@ -1,6 +1,6 @@
 #include "ref.h"
 
-Sunflower::Sunflower(myView *rMV)
+Sunflower::Sunflower()
 {
     //Set up all the attributes of thhe plant.
     this->cost = 50;
@@ -12,11 +12,17 @@ Sunflower::Sunflower(myView *rMV)
     this->seeding = 7.5;
     this->sun = true;
     this->need = false;
-    mV = rMV;
-    rateTimer = new QTimer(mV);
+    //mV = rMV;
+    //rateTimer = new QTimer(mV);
 
     name = "Sunflower";
     setPixmap(QPixmap(":/Sunflower/Sunflower.gif"));
+}
+
+void Sunflower::advance(int phase)
+{
+    if(!phase) return;
+
 }
 
 Sunflower::~Sunflower()
@@ -29,9 +35,7 @@ QString Sunflower::getImagePath()
     return ":/Sunflower/Sunflower.gif";
 }
 
-void Sunflower::onPlant()
+void Sunflower::onPlant(myView *rMV)
 {
-    mV->connect(rateTimer, SIGNAL(timeout()), mV->mapper, SLOT(map()));
-    mV->mapper->setMapping(rateTimer,(QObject*)new QPointF(instances->back()->pos()));
-    rateTimer->start(this->getRate() * 3000);
+    mV = rMV;
 }

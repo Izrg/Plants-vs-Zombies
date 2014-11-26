@@ -8,13 +8,16 @@ class Defence : public Plant
 {
 public:
     Defence();
-    void onPlant();
+    void onPlant(myView *rMV);
 
-protected:
     int splash;
     bool bomb;
     bool sun;
     bool need;
+
+    // QGraphicsItem interface
+public:
+    void advance(int phase);
 };
 
 #endif // DEFENCE_H

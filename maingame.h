@@ -48,7 +48,7 @@ public:
     void checkPlants();
     ~mainGame();
     MainWindow *mW;
-
+    bool plantsAdded;
     QSignalMapper* mapper; //For mapping signals -> Allows passing of values to SLOTs
 
 public slots:

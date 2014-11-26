@@ -11,18 +11,19 @@ class Zombie : public PvZ
 {
 public:
     Zombie();
-    void onSpawn();
+    void onSpawn(myView *rMV);
 
     QTimer *eatTimer;
 
     QList<int>* instanceLife;
 
-protected:
     int zombieLife;
     int equipmentLife;
     int attack;
     double rate;
     double speed;
+    bool isEating;
+    int moveSpeed;
 };
 
 #endif // ZOMBIE_H

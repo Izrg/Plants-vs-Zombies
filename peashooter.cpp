@@ -1,6 +1,6 @@
 #include "ref.h"
 
-Peashooter::Peashooter(myView *rMV)
+Peashooter::Peashooter()
 {
     //Set up the peashooter stats.
     this->cost = 100;
@@ -10,8 +10,7 @@ Peashooter::Peashooter(myView *rMV)
     this->rate = 1.5;
     this->seeding = 7.5;
     this->slow = false;
-    mV = rMV;
-    rateTimer = new QTimer(mV);
+
     inRange = false;
 
     name = "Peashooter";
@@ -23,34 +22,40 @@ QString Peashooter::getImagePath()
     return ":/Plants/PeaShooter.gif";
 }
 
-void Peashooter::onPlant()
+void Peashooter::onPlant(myView *rMV)
 {
+    mV = rMV;
 
-    //rangeRect = new QRectF(this->getPlantLocation().x() * mV->gameBlockHeight,this->getPlantLocation().y()* mV->gameBlockWidth,100,100);
-    //rangeRect = new QRectF(mV->grid[(this->getPlantLocation().x())][this->getPlantLocation().y()]);
-    //rangeRect = new QRectF(mV->grid[(int)this->plantLocation.x()][(int)this->plantLocation.y()]);
-    //rangeRect->setRight(mV->WIDTH);
-    //mV->scene->addRect(*rangeRect);
-    //qDebug() << "Width : " << rangeRect->width() << endl;
-    //qDebug() << "X : " << this->getPlantLocation().x() << " Y : " << this->getPlantLocation().y() << " Range : " << this->range <<  " Height : " << mV->gameBlockHeight << endl;
-    //    mV->connect(rateTimer, SIGNAL(timeout()), mV->mapper, SLOT(map()));
-    //    mV->mapper->setMapping(rateTimer,);
-    //    mV->connect(mapper,SIGNAL(mapped(Plant*)),mV,SLOT(checkZombie(Plant*)));
-    //    rateTimer->start(this->getRate() * 10000);
 }
 
 void Peashooter::advance(int phase)
 {
     if(!phase) return;
 
-    if(inRange){
-        return;
+
+
+    for(int i = 0; i < instances->size(); i ++)
+    {
+        //If the plant is shooting...
+        if(instances->at(i)->flags().testFlag(QGraphicsItem::ItemIsMovable)){
+            //Increment the rateIndex; psudo timer counter.
+            int tempInt = instances->at(i)->data(PvZ::rateIndex).toInt();
+            tempInt ++;
+            instances->at(i)->setData(PvZ::rateIndex,tempInt);
+            //CHANGE THE RATE AT WHICH BULLETS ARE SHOT
+            if(instances->at(i)->data(PvZ::rateIndex).toInt() % (int)(rate*10) == 1){
+                mV->plantShoot(instances->at(i)->data(PvZ::plantType).toInt(),i,false); // Call the plant shoot method to shoot a bullet.
+            }
+            continue;
+        }
+        for(int j=0; j < (mV->zombieGridList->at(instances->at(i)->data((PvZ::rowIndex)).toInt())->size()); j++)
+        {
+            if(mV->zombieGridList->at(j) <= 0) continue;
+            instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
+        }
+
     }
 
-    for (int i = 0; i < ((myView*)mV)->scene->items().size(); i++){
-        if((rangeRect->contains(mV->scene->items().at(i)->pos()) && ((PvZ*)mV->scene->items().at(i))->gametype == 'Z')){
-            qDebug() << "Enemy in range" << endl;
-            inRange = true;
-        }
-    }
+    //for(int i = 0; i < mV->zombieGridList->at()//Peashooter Row)).size(); i++{
+
 }

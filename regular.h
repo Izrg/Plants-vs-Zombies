@@ -9,7 +9,6 @@ class Regular : public Zombie
 {
 public:
     Regular();
-    Regular(myView *mV);
 
     enum{W=50}; //size for the zombie pixmap
 

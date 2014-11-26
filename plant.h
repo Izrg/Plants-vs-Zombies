@@ -13,8 +13,7 @@ class Plant : public PvZ
 public:
     Plant();
 
-    void onPlant();
-
+    virtual void onPlant(myView *rMV) = 0;
     QTimer *rateTimer;
 
     int getCost();
@@ -36,6 +35,10 @@ protected:
     int damage;
     double rate;
     double seeding;
+
+    // QGraphicsItem interface
+public:
+    void advance(int phase);
 };
 
 #endif // PLANT_H

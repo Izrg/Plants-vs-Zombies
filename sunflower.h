@@ -8,12 +8,12 @@ class myView;
 class Sunflower : public Defence
 {
 public:
-    Sunflower(myView *rMV = 0);
+    Sunflower();
     ~Sunflower();
     // Plant interface
 public:
     QString getImagePath();
-
+    void advance(int phase);
 
     // Plant interface
 public:

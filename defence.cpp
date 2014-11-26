@@ -5,7 +5,12 @@ Defence::Defence()
 
 }
 
-void Defence::onPlant()
+void Defence::onPlant(myView *rMV)
+{
+
+}
+
+void Defence::advance(int phase)
 {
 
 }

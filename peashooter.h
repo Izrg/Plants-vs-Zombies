@@ -8,12 +8,12 @@ class myView;
 class Peashooter : public Attack
 {
 public:
-    Peashooter(myView *rMV = 0);
-    void advance(int phase);
+    Peashooter();
 
     // Plant interface
 public:
     QString getImagePath();
+    void advance(int phase);
     // Plant interface
 public:
     void onPlant();
