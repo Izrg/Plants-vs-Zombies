@@ -15,12 +15,15 @@ Bullet::Bullet(myView *rMV)
 
 void Bullet::advance(int phase)
 {
-    for(int i =0; i < instances->size(); i++)
+    if(!phase) return;
+
+TOP:    for(int i =0; i < instances->size(); i++)
     {
         //If the bullet goes off the screen, destroy it.
         if(instances->at(i)->pos().x() + pixmap().width() >= mV->WIDTH){
             delete instances->at(i);
             instances->removeAt(i--);
+            continue;
         }
 
         //Move the bullet across the screen at its speed
@@ -33,11 +36,16 @@ void Bullet::advance(int phase)
             //CRASHES HERE AFTER A ZOMBIE DIES!!.
             if(instances->at(i)->collidesWithItem(mV->zombieGridList->at(instances->at(i)->data(PvZ::rowIndex).toInt())->at(j)))
             {
-                mV->damageZombie(mV->zombieGridList->at(instances->at(i)->data(PvZ::rowIndex).toInt())->at(j)->data(PvZ::zombieType).toInt() , j , instances->at(i)->data(PvZ::damage).toInt());
+                //Save the plant Object and instance that shot this bullet.
+                int plantObject = instances->at(i)->data(PvZ::plantType).toInt();
+                int plantInstance = instances->at(i)->data(PvZ::instanceIndex).toInt();
+
+                int zombieInstance = mV->zombieGridList->at(instances->at(i)->data(PvZ::rowIndex).toInt())->at(j)->data(PvZ::instanceIndex).toInt();
+                mV->damageZombie(mV->zombieGridList->at(instances->at(i)->data(PvZ::rowIndex).toInt())->at(j)->data(PvZ::zombieType).toInt() , zombieInstance , plantObject, plantInstance, instances->at(i)->data(PvZ::damage).toInt());
                 //Delete the bullet.
                 delete instances->at(i);
                 instances->removeAt(i--);
-                return;
+                goto TOP;
             }
         }
     }

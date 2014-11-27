@@ -32,8 +32,7 @@ void Peashooter::advance(int phase)
 {
     if(!phase) return;
 
-
-
+    //For each peashooter instance.
     for(int i = 0; i < instances->size(); i ++)
     {
         //If the plant is shooting...
