@@ -3,7 +3,6 @@
 Plant::Plant()
 {
     gametype = 'P';
-    instanceLife = new QList<int>();
 }
 
 void Plant::onPlant(myView *rMV)

@@ -127,24 +127,24 @@ void myView::zombieEat(int zombieObjectIndex, int zombieInstanceIndex)
     for(int i = 0; i < COLUMNS; i++)
     {
         //If There is no plant in this current location, continue to top of loop.
-        if((plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::rowIndex).toInt()][i]) == NULL) continue;
+        if((plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i]) == NULL) continue;
 
-        if((plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::rowIndex).toInt()][i])->collidesWithItem(zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)))
+        if((plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i])->collidesWithItem(zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)))
         {
             //Get the plants life
-            int tempLife = plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::rowIndex).toInt()][i]->data(PvZ::instanceLife).toInt();
+            int tempLife = plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i]->data(PvZ::INSTANCE_LIFE).toInt();
             //Subtract the zombies attack.
             tempLife -= zombieObj->at(zombieObjectIndex)->attack;
             qDebug() << "Plant Health: " << tempLife << endl;
             //If the health is below 0
             if(tempLife <= 0)
             {
-                int plantObjectIndex = (plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::rowIndex).toInt()][i])->data(PvZ::plantType).toInt();
-                int plantInstanceIndex = (plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::rowIndex).toInt()][i])->data(PvZ::instanceIndex).toInt();
+                int plantObjectIndex = (plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i])->data(PvZ::PLANT_TYPE).toInt();
+                int plantInstanceIndex = (plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i])->data(PvZ::INSTANCE_INDEX).toInt();
                 qDebug() << "Plant object Index: " << plantObjectIndex << endl;
                 qDebug() << "plant Instance Index: " << plantInstanceIndex << endl;
                 //Set the plant grid location to NULL
-                plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::rowIndex).toInt()][i] = NULL;
+                plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i] = NULL;
                 //Delete this plant.
                 //Reset the zombies flag
                 delete plantObj->at(plantObjectIndex)->instances->at(plantInstanceIndex);
@@ -155,56 +155,54 @@ void myView::zombieEat(int zombieObjectIndex, int zombieInstanceIndex)
                 {
                     int temp;
                     //If a specific instance of the plant is larger than the one just erased, push it back 1.
-                    if((temp = plantObj->at(plantObjectIndex)->instances->at(j)->data(PvZ::instanceIndex).toInt()) > plantInstanceIndex)
+                    if((temp = plantObj->at(plantObjectIndex)->instances->at(j)->data(PvZ::INSTANCE_INDEX).toInt()) > plantInstanceIndex)
                     {
-                        plantObj->at(plantObjectIndex)->instances->at(j)->setData(PvZ::instanceIndex,QVariant(temp - 1));
+                        plantObj->at(plantObjectIndex)->instances->at(j)->setData(PvZ::INSTANCE_INDEX,QVariant(temp - 1));
                     }
                 }
                 zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->setFlag(QGraphicsItem::ItemIsMovable,false);
                 return;
             }
             //Set the new health of the plant.
-            plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::rowIndex).toInt()][i]->setData(PvZ::instanceLife,QVariant(tempLife));
+            plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i]->setData(PvZ::INSTANCE_LIFE,QVariant(tempLife));
         }
     }
 }
 
 void myView::plantShoot(int plantObjectType, int plantInstanceIndex, bool slow)
 {
-    //qDebug() << "Plant Type : " << plantObj->at(plantObjectType)->name << "Plant Instance " << plantInstanceIndex<< " SHOOTS" << endl;
-    bullet->instances->append(scene->addPixmap(bullet->pixmap()));
+    bullet->instances->append(scene->addPixmap(*bullet->getBullet(slow)));
     //Set the position of the bullet to the plant that shot it.
     bullet->instances->back()->setPos(plantObj->at(plantObjectType)->instances->at(plantInstanceIndex)->pos().x() + 40,plantObj->at(plantObjectType)->instances->at(plantInstanceIndex)->pos().y());
-    bullet->instances->back()->setData(PvZ::rowIndex,QVariant(plantObj->at(plantObjectType)->instances->at(plantInstanceIndex)->data(PvZ::rowIndex).toInt()));
-    bullet->instances->back()->setData(PvZ::damage,QVariant(plantObj->at(plantObjectType)->instances->at(plantInstanceIndex)->data(PvZ::damage).toInt()));
-    bullet->instances->back()->setData(PvZ::plantType,QVariant(plantObjectType));
-    bullet->instances->back()->setData(PvZ::instanceIndex,QVariant(plantObj->at(plantObjectType)->instances->at(plantInstanceIndex)->data(PvZ::instanceIndex).toInt()));
+    bullet->instances->back()->setData(PvZ::ROW_INDEX,QVariant(plantObj->at(plantObjectType)->instances->at(plantInstanceIndex)->data(PvZ::ROW_INDEX).toInt()));
+    bullet->instances->back()->setData(PvZ::INSTANCE_DAMAGE,QVariant(plantObj->at(plantObjectType)->instances->at(plantInstanceIndex)->data(PvZ::INSTANCE_DAMAGE).toInt()));
+    bullet->instances->back()->setData(PvZ::PLANT_TYPE,QVariant(plantObjectType));
+    bullet->instances->back()->setData(PvZ::INSTANCE_INDEX,QVariant(plantObj->at(plantObjectType)->instances->at(plantInstanceIndex)->data(PvZ::INSTANCE_INDEX).toInt()));
 }
 
-void myView::damageZombie(int zombieObjectIndex, int zombieInstanceIndex, int plantObjectIndex,int plantInstanceIndex, int damage)
+void myView::damageZombie(int zombieObjectIndex, int zombieInstanceIndex,int damage, bool slow)
 {
-    //Get the zombies current life.
-    int tempLife = zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::instanceLife).toInt();
-    qDebug() << "Zombie Instance: " << zombieInstanceIndex << endl;
-    //Subtract the damage.
+    int tempLife = zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::INSTANCE_LIFE).toInt();
     tempLife -= damage;
-    //qDebug() << "Zombie Life: " << tempLife << endl;
+
+    if(slow){
+        qDebug() << "Slow shot!" << endl;
+    }
+
     if(tempLife <= 0)
     {
-        //Reset the plant flag, no they wont shoot anymore.
-        plantObj->at(plantObjectIndex)->instances->at(plantInstanceIndex)->setFlag(QGraphicsItem::ItemIsMovable,false);
         //Remove the zombie from the gridlist.
-        zombieGridList->at(zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::rowIndex).toInt())->removeAt(zombieInstanceIndex);
+        zombieGridList->at(zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt())->removeAt(zombieInstanceIndex);
         //Go through the zombies and decrement their instance by 1 as a zombie was just killed.
         for(int j = 0; j < zombieObj->at(zombieObjectIndex)->instances->size(); j++)
         {
             int temp;
             //If a specific instance of the zombie is larger than the one just erased, push it back 1.
-            qDebug() << "Next zombie instance : " << zombieObj->at(zombieObjectIndex)->instances->at(j)->data(PvZ::instanceIndex).toInt() << endl;
-            if((temp = zombieObj->at(zombieObjectIndex)->instances->at(j)->data(PvZ::instanceIndex).toInt()) > zombieInstanceIndex)
+            qDebug() << "Next zombie instance : " << zombieObj->at(zombieObjectIndex)->instances->at(j)->data(PvZ::INSTANCE_INDEX).toInt() << endl;
+            if((temp = zombieObj->at(zombieObjectIndex)->instances->at(j)->data(PvZ::INSTANCE_INDEX).toInt()) > zombieInstanceIndex)
             {
                 temp --;
-                zombieObj->at(zombieObjectIndex)->instances->at(j)->setData(PvZ::instanceIndex,QVariant(temp));
+                zombieObj->at(zombieObjectIndex)->instances->at(j)->setData(PvZ::INSTANCE_INDEX,QVariant(temp));
             }
         }
         delete zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex);
@@ -214,8 +212,8 @@ void myView::damageZombie(int zombieObjectIndex, int zombieInstanceIndex, int pl
 
     }
     //Set the zombies new health.
-    zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->setData(PvZ::instanceLife,QVariant(tempLife));
-    qDebug() << "Zombie health: " << zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::instanceLife).toInt();
+    zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->setData(PvZ::INSTANCE_LIFE,QVariant(tempLife));
+
 }
 //This is called to spawn zombies.
 void myView::zombieSpawner()
@@ -231,29 +229,32 @@ void myView::zombieSpawner()
         int row = random(0, ROWS - 1);
         zombieGridList->at(row)->append(zombieObj->at(WHICH_ZOMBIE)->instances->back());
         //Saves the zombie type to the zombie grid list.
-        zombieGridList->at(row)->back()->setData(PvZ::zombieType,QVariant(WHICH_ZOMBIE));
-        zombieGridList->at(row)->back()->setData(PvZ::instanceIndex,QVariant(zombieObj->at(WHICH_ZOMBIE)->instances->size() - 1));
+        zombieGridList->at(row)->back()->setData(PvZ::ZOMBIE_TYPE,QVariant(WHICH_ZOMBIE));
+        zombieGridList->at(row)->back()->setData(PvZ::INSTANCE_INDEX,QVariant(zombieObj->at(WHICH_ZOMBIE)->instances->size() - 1));
+
+        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::Z_SPEED,QVariant(zombieObj->at(WHICH_ZOMBIE)->speed));
 
         zombieObj->at(WHICH_ZOMBIE)->instances->back()->setPos(COLUMNS * gameBlockWidth, row * gameBlockHeight);
         //Set the zombies class type.
-        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::classType,QVariant('Z'));
+        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::CLASS_TYPE,QVariant('Z'));
         //Set the zombie instance.
-        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::instanceIndex,QVariant(zombieObj->at(WHICH_ZOMBIE)->instances->size() - 1));
+        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::INSTANCE_INDEX,QVariant(zombieObj->at(WHICH_ZOMBIE)->instances->size() - 1));
         /*
          * TODO:
          * NEED TO CHANGE THE "ZOMBIE TYPE" TO BE WHATEVER ZOMBIE HAS SPAWNED
          * E.G, 0 = Regular Zombie, 1 = Conehead, etc...
          *
          */
-        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::zombieType,QVariant(0));
+        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::ZOMBIE_TYPE,QVariant(0));
         //Set the zombie ='s rate index instance to 0;
-        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::rateIndex,QVariant(0));
+        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::RATE_INDEX,QVariant(0));
         //Add the row of the current zombie instance to the Row index
-        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::rowIndex,QVariant(row));
+        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::ROW_INDEX,QVariant(row));
         //Set this zombie instance health to Zombie health + its equipment health
-        zombieObj->at(WHICH_ZOMBIE)->instanceLife->append((zombieObj->at(WHICH_ZOMBIE)->zombieLife) + (zombieObj->at(WHICH_ZOMBIE)->equipmentLife));
+        //zombieObj->at(WHICH_ZOMBIE)->instanceLife->append((zombieObj->at(WHICH_ZOMBIE)->zombieLife) + (zombieObj->at(WHICH_ZOMBIE)->equipmentLife));
+        int tempLife = zombieObj->at(WHICH_ZOMBIE)->zombieLife + zombieObj->at(WHICH_ZOMBIE)->equipmentLife;
         //Set the zombie instance life index with the zombies health.
-        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::instanceLife,QVariant(zombieObj->at(WHICH_ZOMBIE)->instanceLife->back()));
+        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::INSTANCE_LIFE,QVariant(tempLife));
 
         //Call zombie on spawn function.
         zombieObj->at(WHICH_ZOMBIE)->onSpawn(this);
@@ -279,31 +280,34 @@ void myView::mousePressEvent(QMouseEvent *event)
                     mG->plantObj->at(mG->plantSelected)->instances->back()->setPos(j * gameBlockWidth, i * gameBlockHeight);
 
                     //Save this plants instance number
-                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::instanceIndex, QVariant(mG->plantObj->at(mG->plantSelected)->instances->size() - 1));
-                    plantGrid[i][j]->setData(PvZ::instanceIndex, QVariant(mG->plantObj->at(mG->plantSelected)->instances->size() - 1));
+                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::INSTANCE_INDEX, QVariant(mG->plantObj->at(mG->plantSelected)->instances->size() - 1));
+                    plantGrid[i][j]->setData(PvZ::INSTANCE_INDEX, QVariant(mG->plantObj->at(mG->plantSelected)->instances->size() - 1));
+                    //Sets the plant slow data.
+                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::INSTANCE_SLOW,QVariant(mG->plantObj->at(mG->plantSelected)->slow));
 
                     //Sets the plant type e.g; 0 = Sunflower, 1 = peashooter etc..
-                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::plantType,QVariant(mG->plantSelected));
-                    plantGrid[i][j]->setData(PvZ::plantType, QVariant(mG->plantSelected));
+                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::PLANT_TYPE,QVariant(mG->plantSelected));
+                    plantGrid[i][j]->setData(PvZ::PLANT_TYPE, QVariant(mG->plantSelected));
                     //Sets the plants damage.
-                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::damage,QVariant(mG->plantObj->at(mG->plantSelected)->damage));
+                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::INSTANCE_DAMAGE,QVariant(mG->plantObj->at(mG->plantSelected)->damage));
 
                     //Sets the plants class type.
-                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::classType,QVariant('P'));
-                    plantGrid[i][j]->setData(PvZ::classType, QVariant('P'));
+                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::CLASS_TYPE,QVariant('P'));
+                    plantGrid[i][j]->setData(PvZ::CLASS_TYPE, QVariant('P'));
 
                     //Sets the plants rateindex to 0.
-                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::rateIndex,QVariant(0));
+                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::RATE_INDEX,QVariant(0));
 
                     //Set the plants instance life
-                    mG->plantObj->at(mG->plantSelected)->instanceLife->append(mG->plantObj->at(mG->plantSelected)->life);
+                    //WALLNUT HERE
+                    //mG->plantObj->at(mG->plantSelected)->instanceLife->append(mG->plantObj->at(mG->plantSelected)->life);
                     //Saves the instance life in the plants data.
-                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::instanceLife,QVariant(mG->plantObj->at(mG->plantSelected)->instanceLife->back() - 1));
-                    plantGrid[i][j]->setData(PvZ::instanceLife, QVariant(mG->plantObj->at(mG->plantSelected)->instanceLife->back() - 1));
+                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::INSTANCE_LIFE,QVariant(mG->plantObj->at(mG->plantSelected)->life));
+                    plantGrid[i][j]->setData(PvZ::INSTANCE_LIFE, QVariant(mG->plantObj->at(mG->plantSelected)->life));
 
                     //Sets the plants Row: i and Column: j
-                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::rowIndex,QVariant(i));
-                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::columnIndex,QVariant(j));
+                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::ROW_INDEX,QVariant(i));
+                    mG->plantObj->at(mG->plantSelected)->instances->back()->setData(PvZ::COLUMN_INDEX,QVariant(j));
 
                     //Calls the plants onPLant function
                     mG->plantObj->at(mG->plantSelected)->onPlant(this);

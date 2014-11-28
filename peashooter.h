@@ -9,7 +9,7 @@ class Peashooter : public Attack
 {
 public:
     Peashooter();
-
+    static int rateCount,rateMax;
     // Plant interface
 public:
     QString getImagePath();

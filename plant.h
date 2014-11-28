@@ -28,13 +28,14 @@ public:
 public slots:
     void rateFunc();
 
-protected:
+
     int cost;
     int life;
     int range;
     int damage;
     double rate;
     double seeding;
+    bool slow;
 
     // QGraphicsItem interface
 public:

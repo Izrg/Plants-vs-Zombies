@@ -12,8 +12,6 @@ Sunflower::Sunflower()
     this->seeding = 7.5;
     this->sun = true;
     this->need = false;
-    //mV = rMV;
-    //rateTimer = new QTimer(mV);
 
     name = "Sunflower";
     setPixmap(QPixmap(":/Sunflower/Sunflower.gif"));

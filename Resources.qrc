@@ -14,6 +14,14 @@
     <qresource prefix="/Plants">
         <file>PeaShooter.gif</file>
         <file>Bullet.PNG</file>
+        <file>Wallnut_body.png</file>
+        <file>Wallnut_cracked1.png</file>
+        <file>Wallnut_cracked2.png</file>
+        <file>Chomper_Eating.gif</file>
+        <file>Chomper.png</file>
+        <file>Chomper_bite.gif</file>
+        <file>SnowPea.png</file>
+        <file>SnowBullet.png</file>
     </qresource>
     <qresource prefix="/Zombies">
         <file>Regular.gif</file>

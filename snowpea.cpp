@@ -1,6 +1,6 @@
 #include "ref.h"
 
-Peashooter::Peashooter()
+Snowpea::Snowpea()
 {
     //Set up the peashooter stats.
     this->cost = 100;
@@ -9,28 +9,17 @@ Peashooter::Peashooter()
     this->damage = 1;
     this->rate = 1.5;
     this->seeding = 7.5;
-    this->slow = false;
-
-    name = "Peashooter";
-    setPixmap(QPixmap(":/Plants/PeaShooter.gif"));
+    this->slow = true;
 
     rateCount = 0;
     rateMax = (int)((double)rate * 10);
-}
 
-QString Peashooter::getImagePath()
-{
-    return ":/Plants/PeaShooter.gif";
-}
-
-void Peashooter::onPlant(myView *rMV)
-{
-    mV = rMV;
-    instances->back()->setData(RATE_INDEX, this->rateCount);
+    name = "Snow Pea";
+    setPixmap(QPixmap(":/Plants/SnowPea.png").scaled(W,W));
 
 }
 
-void Peashooter::advance(int phase)
+void Snowpea::advance(int phase)
 {
     if(!phase) return;
 
@@ -42,17 +31,17 @@ void Peashooter::advance(int phase)
             //Reset the zombie shooting
             instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
         }
-
         //If the plant is shooting...
         if(instances->at(i)->flags().testFlag(QGraphicsItem::ItemIsMovable))
         {
             //CHANGE THE RATE AT WHICH BULLETS ARE SHOT
             if(instances->at(i)->data(PvZ::RATE_INDEX).toInt() == this->rateCount)
             {
-                mV->plantShoot(instances->at(i)->data(PvZ::PLANT_TYPE).toInt(),i,false); // Call the plant shoot method to shoot a bullet.
+                mV->plantShoot(instances->at(i)->data(PvZ::PLANT_TYPE).toInt(),i,true); // Call the plant shoot method to shoot a bullet.
             }
             continue;
         }
+        //For all the zombies in the current plants row.
         for(int j=0; j < (mV->zombieGridList->at(instances->at(i)->data((PvZ::ROW_INDEX)).toInt())->size()); j++)
         {
             if(mV->zombieGridList->at(j) <= 0) continue;
@@ -62,4 +51,12 @@ void Peashooter::advance(int phase)
     }
 
     ++rateCount %= rateMax;
+}
+
+void Snowpea::onPlant(myView *rMV)
+{
+    mV = rMV;
+    instances->back()->setData(RATE_INDEX, this->rateCount);
+
+
 }

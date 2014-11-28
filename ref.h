@@ -21,17 +21,19 @@ public:
     char gametype;
     QString name;
 
-    const static int classType = 0;
-    const static int instanceLife = 1;
-    const static int rateIndex = 2;
-    const static int rowIndex = 3;
-    const static int columnIndex = 4;
-    const static int zombieType = 5;
-    const static int plantType = 6;
-    const static int instanceIndex = 7;
-    const static int damage = 8;
+    const static int CLASS_TYPE = 0;
+    const static int INSTANCE_LIFE = 1;
+    const static int RATE_INDEX = 2;
+    const static int ROW_INDEX = 3;
+    const static int COLUMN_INDEX = 4;
+    const static int ZOMBIE_TYPE = 5;
+    const static int PLANT_TYPE = 6;
+    const static int INSTANCE_INDEX = 7;
+    const static int INSTANCE_DAMAGE = 8;
+    const static int INSTANCE_SLOW = 9;
+    const static int Z_SPEED = 10;
 
-
+    int rateCount,rateMax;
     myView *mV;
 
     QList<QGraphicsPixmapItem*>* instances;
@@ -76,11 +78,8 @@ public:
     void setLife(int newLife);
     bool inRange;
 
-    QList<int>* instanceLife;
+    QList<int>* INSTANCE_LIFE;
     QList<int>* counter; // used to keep track of plant actions.
-
-public slots:
-    void rateFunc();
 
     int cost;
     int life;
@@ -88,16 +87,18 @@ public slots:
     int damage;
     double rate;
     double seeding;
+    bool slow;
+
 };
 
 class Zombie : public PvZ
 {
 public:
     Zombie();
-    void onSpawn(myView *rMV);
+
     int getAttack();
     QTimer *eatTimer;
-    QList<int>* instanceLife;
+    QList<int>* INSTANCE_LIFE;
     QList<int>* counter;
 
     int zombieLife;
@@ -107,6 +108,7 @@ public:
     double speed;
     GraphicsItemFlag isEating;
     enum{COMMON_FACTOR = 10};
+    virtual void onSpawn(myView *rMV) = 0;
 };
 
 class Attack : public Plant
@@ -130,6 +132,10 @@ public:
     Bullet(myView *rMV);
     enum {W= 15};
     int speed;
+    QPixmap *getBullet(bool slow);
+private:
+    QPixmap* snowBullet;
+
 public slots:
     void advance(int phase);
 
@@ -164,7 +170,44 @@ public:
 public:
     void onPlant(myView *rMV);
 };
+//*--------SNOW PEA--------*
+class Snowpea : public Attack
+{
+public:
+    Snowpea();
+    enum {W=50};
+    void onPlant(myView *rMV);
+    // QGraphicsItem interface
+public:
+    void advance(int phase);
+};
 
+
+//WALLNUT
+class Wallnut : public Defence
+{
+public:
+    Wallnut();
+    enum{W=50}; //size for the Wallnut pixmap
+    void advance(int phase);
+
+    // Plant interface
+public:
+    void onPlant(myView *rMV);
+};
+//CHOMPER
+class Chomper : public Attack
+{
+public:
+    Chomper();
+    enum{W=50}; //size for the Wallnut pixmap
+    void advance(int phase);
+    // Plant interface
+public:
+    void onPlant(myView *rMV);
+};
+
+//PEASHOOTER
 class Peashooter : public Attack
 {
 public:
@@ -187,6 +230,7 @@ public:
     enum{W=50}; //size for the zombie pixmap
 
     void advance(int phase); //advance function for the zombie.
+    void onSpawn(myView *rMV);
 };
 
 #endif // REF_H

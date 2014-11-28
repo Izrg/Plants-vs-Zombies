@@ -20,6 +20,11 @@ mainGame::mainGame(QWidget *parent) :
     plantObj = new QList<Plant*>();
     plantObj->append(new Sunflower());
     plantObj->append(new Peashooter());
+    plantObj->last()->slow = false;
+    plantObj->append(new Wallnut());
+    plantObj->append(new Snowpea());
+    plantObj->last()->slow = true;
+    plantObj->append(new Chomper());
 
     mV = new myView(ui->gameBoard,this);
     mV->plantObj = plantObj;

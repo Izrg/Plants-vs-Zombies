@@ -26,7 +26,10 @@ SOURCES += main.cpp\
     regular.cpp \
     pvz.cpp \
     grass.cpp \
-    bullet.cpp
+    bullet.cpp \
+    wallnut.cpp \
+    chomper.cpp \
+    snowpea.cpp
 
 HEADERS  += mainwindow.h \
     maingame.h \
@@ -42,7 +45,10 @@ HEADERS  += mainwindow.h \
     pvz.h \
     grass.h \
     ref.h \
-    bullet.h
+    bullet.h \
+    wallnut.h \
+    chomper.h \
+    snowpea.h
 
 FORMS    += mainwindow.ui \
     maingame.ui

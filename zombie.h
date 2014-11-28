@@ -11,7 +11,7 @@ class Zombie : public PvZ
 {
 public:
     Zombie();
-    void onSpawn(myView *rMV);
+    virtual void onSpawn(myView *rMV) = 0;
 
     QTimer *eatTimer;
 

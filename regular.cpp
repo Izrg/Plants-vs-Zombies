@@ -12,9 +12,9 @@ Regular::Regular()
     //Load zombies image, and make it WxW
     setPixmap(QPixmap(":/Zombies/Regular.gif").scaled(W,W));
 
-    //mV = rMV; // Sets the current mainview.
+    rateCount = 0;
+    rateMax = (int)((double)rate * 10);
 
-    //eatTimer = new QTimer(mV);
 }
 
 
@@ -26,12 +26,9 @@ void Regular::advance(int phase)
     {
         if(instances->at(i)->flags().testFlag(QGraphicsItem::ItemIsMovable))
         {
-            int tempInt = instances->at(i)->data(PvZ::rateIndex).toInt();
-            tempInt ++;
-            instances->at(i)->setData(PvZ::rateIndex,QVariant(tempInt));
             //Check for rate of attack. TODO: SOME SERIOUS MATH!!
-            if(instances->at(i)->data(PvZ::rateIndex).toInt() % (int)(rate*50) == 1){
-                mV->zombieEat(instances->at(i)->data(PvZ::zombieType).toInt(),i);
+            if(instances->at(i)->data(PvZ::RATE_INDEX).toInt() == this->rateCount){
+                mV->zombieEat(instances->at(i)->data(PvZ::ZOMBIE_TYPE).toInt(),i);
             }
             continue;
         }
@@ -46,7 +43,7 @@ void Regular::advance(int phase)
             continue;
         }
         //Move the zombie
-        instances->at(i)->setX(instances->at(i)->pos().x() - speed * 0.5);
+        instances->at(i)->setX(instances->at(i)->pos().x() - instances->at(i)->data(Z_SPEED).toInt());
         //Chekc if the zombie hits a plant
         //For each plant object....
 
@@ -54,9 +51,9 @@ void Regular::advance(int phase)
         for(int j = 0; j < mV->COLUMNS; j++)
         {
             //If there is no plant in the current column, continue.
-            if(mV->plantGrid[instances->at(i)->data(PvZ::rowIndex).toInt()][j] == NULL) continue;
+            if(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j] == NULL) continue;
             //If the zombie collides with a plant, set a flag and return.
-            if(instances->at(i)->collidesWithItem(mV->plantGrid[instances->at(i)->data(PvZ::rowIndex).toInt()][j]))
+            if(instances->at(i)->collidesWithItem(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j]))
             {
                 //Set flag.
                 instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
@@ -65,4 +62,12 @@ void Regular::advance(int phase)
         }
 
     }
+    ++rateCount %= rateMax;
+}
+
+void Regular::onSpawn(myView *rMV)
+{
+    mV = rMV;
+    instances->back()->setData(RATE_INDEX, this->rateCount);
+    instances->back()->setData(Z_SPEED,mV->gameBlockWidth / (this->speed * 10));
 }

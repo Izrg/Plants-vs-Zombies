@@ -73,7 +73,7 @@ public:
 
     void zombieEat(int,int); // Called when the zombie eats plant brains.
     void plantShoot(int,int,bool);
-    void damageZombie(int,int,int,int,int);
+    void damageZombie(int zombieObject,int zombieInstance,int damage, bool slow);
 public slots:
     void sunSpawn(QObject*);
     void zombieSpawner();
