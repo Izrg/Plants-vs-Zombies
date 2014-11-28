@@ -42,10 +42,10 @@ void Regular::advance(int phase)
             //Probably add your END GAME thing here
             continue;
         }
+
         //Move the zombie
-        instances->at(i)->setX(instances->at(i)->pos().x() - instances->at(i)->data(Z_SPEED).toInt());
+        instances->at(i)->setX(instances->at(i)->pos().x() - instances->at(i)->data(Z_SPEED).toDouble());
         //Chekc if the zombie hits a plant
-        //For each plant object....
 
         //Go through each column of the current row.
         for(int j = 0; j < mV->COLUMNS; j++)

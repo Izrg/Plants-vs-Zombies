@@ -25,6 +25,7 @@ mainGame::mainGame(QWidget *parent) :
     plantObj->append(new Snowpea());
     plantObj->last()->slow = true;
     plantObj->append(new Chomper());
+    plantObj->append(new Cherrybomb());
 
     mV = new myView(ui->gameBoard,this);
     mV->plantObj = plantObj;

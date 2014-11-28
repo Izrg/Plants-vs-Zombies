@@ -11,7 +11,7 @@ Snowpea::Snowpea()
     this->seeding = 7.5;
     this->slow = true;
 
-    rateCount = 0;
+
     rateMax = (int)((double)rate * 10);
 
     name = "Snow Pea";
@@ -56,6 +56,7 @@ void Snowpea::advance(int phase)
 void Snowpea::onPlant(myView *rMV)
 {
     mV = rMV;
+    rateCount = 0;
     instances->back()->setData(RATE_INDEX, this->rateCount);
 
 

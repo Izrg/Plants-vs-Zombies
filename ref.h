@@ -170,6 +170,17 @@ public:
 public:
     void onPlant(myView *rMV);
 };
+//*--------CherryBomb--------*
+class Cherrybomb : public Defence
+{
+public:
+    Cherrybomb();
+    enum {W=50};
+    void advance(int phase);
+    void onPlant(myView *rMV);
+
+};
+
 //*--------SNOW PEA--------*
 class Snowpea : public Attack
 {
@@ -177,13 +188,14 @@ public:
     Snowpea();
     enum {W=50};
     void onPlant(myView *rMV);
+
     // QGraphicsItem interface
 public:
     void advance(int phase);
 };
 
 
-//WALLNUT
+//*--------Wallnut--------*
 class Wallnut : public Defence
 {
 public:
@@ -195,19 +207,21 @@ public:
 public:
     void onPlant(myView *rMV);
 };
-//CHOMPER
+
+//*--------Chomper--------*
 class Chomper : public Attack
 {
 public:
     Chomper();
     enum{W=50}; //size for the Wallnut pixmap
     void advance(int phase);
+
     // Plant interface
 public:
     void onPlant(myView *rMV);
 };
 
-//PEASHOOTER
+//*--------Peashooter--------*
 class Peashooter : public Attack
 {
 public:

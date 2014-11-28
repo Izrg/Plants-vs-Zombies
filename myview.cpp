@@ -141,8 +141,8 @@ void myView::zombieEat(int zombieObjectIndex, int zombieInstanceIndex)
             {
                 int plantObjectIndex = (plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i])->data(PvZ::PLANT_TYPE).toInt();
                 int plantInstanceIndex = (plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i])->data(PvZ::INSTANCE_INDEX).toInt();
-                qDebug() << "Plant object Index: " << plantObjectIndex << endl;
-                qDebug() << "plant Instance Index: " << plantInstanceIndex << endl;
+                //qDebug() << "Plant object Index: " << plantObjectIndex << endl;
+                //qDebug() << "plant Instance Index: " << plantInstanceIndex << endl;
                 //Set the plant grid location to NULL
                 plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i] = NULL;
                 //Delete this plant.
@@ -185,8 +185,20 @@ void myView::damageZombie(int zombieObjectIndex, int zombieInstanceIndex,int dam
     int tempLife = zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::INSTANCE_LIFE).toInt();
     tempLife -= damage;
 
-    if(slow){
-        qDebug() << "Slow shot!" << endl;
+    if(slow)
+    {
+        //Check a zombie slowed flag.
+        if(!zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->flags().testFlag(QGraphicsItem::ItemIsPanel))
+        {
+            //CHANGE ZOMBIE COLOR HERE!!!!!
+            //Set a zombie slowed flag.
+            zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->setFlag(QGraphicsItem::ItemIsPanel, true);
+            qDebug() << "Before Speed: " << zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::Z_SPEED).toDouble() << endl;
+            zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->setData(PvZ::Z_SPEED,QVariant(zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::Z_SPEED).toDouble() * 0.5));
+            qDebug() << "After Speed: " << zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::Z_SPEED).toDouble() << endl;
+            zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->setData(PvZ::RATE_INDEX,QVariant(zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::RATE_INDEX).toDouble() * 0.5));
+
+        }
     }
 
     if(tempLife <= 0)
@@ -251,7 +263,6 @@ void myView::zombieSpawner()
         //Add the row of the current zombie instance to the Row index
         zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::ROW_INDEX,QVariant(row));
         //Set this zombie instance health to Zombie health + its equipment health
-        //zombieObj->at(WHICH_ZOMBIE)->instanceLife->append((zombieObj->at(WHICH_ZOMBIE)->zombieLife) + (zombieObj->at(WHICH_ZOMBIE)->equipmentLife));
         int tempLife = zombieObj->at(WHICH_ZOMBIE)->zombieLife + zombieObj->at(WHICH_ZOMBIE)->equipmentLife;
         //Set the zombie instance life index with the zombies health.
         zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::INSTANCE_LIFE,QVariant(tempLife));

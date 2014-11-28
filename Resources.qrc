@@ -22,6 +22,7 @@
         <file>Chomper_bite.gif</file>
         <file>SnowPea.png</file>
         <file>SnowBullet.png</file>
+        <file>Cherrybomb.gif</file>
     </qresource>
     <qresource prefix="/Zombies">
         <file>Regular.gif</file>

@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     bullet.cpp \
     wallnut.cpp \
     chomper.cpp \
-    snowpea.cpp
+    snowpea.cpp \
+    cherrybomb.cpp
 
 HEADERS  += mainwindow.h \
     maingame.h \
@@ -48,7 +49,8 @@ HEADERS  += mainwindow.h \
     bullet.h \
     wallnut.h \
     chomper.h \
-    snowpea.h
+    snowpea.h \
+    cherrybomb.h
 
 FORMS    += mainwindow.ui \
     maingame.ui

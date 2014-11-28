@@ -14,7 +14,7 @@ Peashooter::Peashooter()
     name = "Peashooter";
     setPixmap(QPixmap(":/Plants/PeaShooter.gif"));
 
-    rateCount = 0;
+
     rateMax = (int)((double)rate * 10);
 }
 
@@ -26,6 +26,7 @@ QString Peashooter::getImagePath()
 void Peashooter::onPlant(myView *rMV)
 {
     mV = rMV;
+    rateCount = 0;
     instances->back()->setData(RATE_INDEX, this->rateCount);
 
 }
