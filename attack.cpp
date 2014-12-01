@@ -20,3 +20,8 @@ void Attack::advance(int phase)
     }
     qDebug() << "TEST ADVANCE PEASHOOTER" << endl;*/
 }
+
+void Attack::destroy(int index)
+{
+
+}

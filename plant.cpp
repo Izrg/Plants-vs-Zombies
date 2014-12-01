@@ -31,6 +31,11 @@ void Plant::setLife(int newLife)
     life = newLife;
 }
 
+void Plant::destroy(int index)
+{
+
+}
+
 void Plant::advance(int phase)
 {
 

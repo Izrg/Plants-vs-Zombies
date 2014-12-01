@@ -1,4 +1,5 @@
 #include "ref.h"
+extern QList<QList<QGraphicsPixmapItem*>*> *zombieGridList;
 
 Chomper::Chomper()
 {
@@ -22,37 +23,51 @@ void Chomper::advance(int phase)
 {
     if(!phase) return;
 
-    for(int i = 0; i < instances->size(); i++){
+    for(int i = 0; i < instances->size(); i++)
+    {
 
         if(instances->at(i)->flags().testFlag(QGraphicsItem::ItemIsMovable)){
             //CHANGE THE RATE AT WHICH BULLETS ARE SHOT
-            if(instances->at(i)->data(PvZ::RATE_INDEX).toInt() == this->rateCount){
+            if(instances->at(i)->data(PvZ::RATE_INDEX).toInt() == this->rateCount)
+            {
                 instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
                 instances->at(i)->setPixmap(QPixmap(":/Plants/Chomper.png").scaled(W,W));
             }
             continue;
         }
 
-        for(int j=0; j < (mV->zombieGridList->at(instances->at(i)->data((PvZ::ROW_INDEX)).toInt())->size()); j++)
+        for(int j=0; j < (zombieGridList->at(instances->at(i)->data((PvZ::ROW_INDEX)).toInt())->size()); j++)
         {
-            if(instances->at(i)->collidesWithItem(mV->zombieGridList->at(instances->at(i)->data((PvZ::ROW_INDEX)).toInt())->at(j)))
+
+            //CRASHES HERE WHEN CHOMPER EATS SECOND ZOMBIE IN SAME ROW AFTER IT ATE THE FIST ONE.
+            //ONLY SOMETIMES IT SEEMS.
+            //CRASHES WHEN CHOMPER EATS ZOMBIE AFTER ANOTHER CHOMPER ATE A ZOMBIE,
+            if(instances->at(i)->collidesWithItem(zombieGridList->at(instances->at(i)->data((PvZ::ROW_INDEX)).toInt())->at(j)))
             {
 
                 instances->at(i)->setPixmap(QPixmap(":/Plants/Chomper_bite.gif").scaled(W,W));
                 //Get the zombie object and instance
-                int zombieObject = mV->zombieGridList->at(instances->at(i)->data(PvZ::ROW_INDEX).toInt())->at(j)->data(PvZ::ZOMBIE_TYPE).toInt();
-                int zombieInstance = mV->zombieGridList->at(instances->at(i)->data(PvZ::ROW_INDEX).toInt())->at(j)->data(PvZ::INSTANCE_INDEX).toInt();
+                int zombieObject = zombieGridList->at(instances->at(i)->data(PvZ::ROW_INDEX).toInt())->at(j)->data(PvZ::ZOMBIE_TYPE).toInt();
+                int zombieInstance = zombieGridList->at(instances->at(i)->data(PvZ::ROW_INDEX).toInt())->at(j)->data(PvZ::INSTANCE_INDEX).toInt();
                 //Damage the zombie.
-                mV->damageZombie(zombieObject,zombieInstance,instances->at(i)->data(PvZ::INSTANCE_DAMAGE).toInt(),false);
+                mV->damageZombie(zombieObject,zombieInstance, j , instances->at(i)->data(PvZ::INSTANCE_DAMAGE).toInt(),false);
                 instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
+                instances->at(i)->setData(RATE_INDEX, this->rateCount);
+
             }
         }
     }
     ++rateCount %= rateMax;
 }
 
+void Chomper::destroy(int index)
+{
+    delete instances->at(index);
+    instances->removeAt(index);
+}
+
 void Chomper::onPlant(myView *rMV)
 {
     mV = rMV;
-    instances->back()->setData(RATE_INDEX, this->rateCount);
+
 }

@@ -23,7 +23,32 @@ void Regular::advance(int phase)
     if(!phase) return;
 
     for (int i = 0; i < instances->size(); i++)
-    {
+    {   /*
+        //The zombie moves if there is nothing at its position.
+        int c = -1;
+        for (int v = instances->at(i)->pos().y(); v > 0; c++) v -= mV->gameBlockWidth;
+        if(mV->plantGrid[instances->at(i)->data(ROW_INDEX).toInt()][c] == NULL)
+        {
+            instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+        }*/
+
+        for(int j = 0; j < mV->COLUMNS; j++)
+        {
+            //instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+            //If there is no plant in the current column, continue.
+            if(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j] == NULL) {
+                instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+                continue;
+            }
+            //If the zombie collides with a plant, set a flag and return.
+            else if(instances->at(i)->collidesWithItem(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j]))
+            {
+                //Set flag.
+                instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
+                break;
+            }
+        }
+
         if(instances->at(i)->flags().testFlag(QGraphicsItem::ItemIsMovable))
         {
             //Check for rate of attack. TODO: SOME SERIOUS MATH!!
@@ -32,6 +57,9 @@ void Regular::advance(int phase)
             }
             continue;
         }
+
+        //Move the zombie
+        instances->at(i)->setX(instances->at(i)->pos().x() - instances->at(i)->data(Z_SPEED).toDouble());
 
         //Remove if offscreen
         if(instances->at(i)->pos().x() + pixmap().width() <= 0)
@@ -43,24 +71,8 @@ void Regular::advance(int phase)
             continue;
         }
 
-        //Move the zombie
-        instances->at(i)->setX(instances->at(i)->pos().x() - instances->at(i)->data(Z_SPEED).toDouble());
         //Chekc if the zombie hits a plant
-
         //Go through each column of the current row.
-        for(int j = 0; j < mV->COLUMNS; j++)
-        {
-            //If there is no plant in the current column, continue.
-            if(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j] == NULL) continue;
-            //If the zombie collides with a plant, set a flag and return.
-            if(instances->at(i)->collidesWithItem(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j]))
-            {
-                //Set flag.
-                instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
-                return;
-            }
-        }
-
     }
     ++rateCount %= rateMax;
 }
@@ -70,4 +82,10 @@ void Regular::onSpawn(myView *rMV)
     mV = rMV;
     instances->back()->setData(RATE_INDEX, this->rateCount);
     instances->back()->setData(Z_SPEED,mV->gameBlockWidth / (this->speed * 10));
+}
+
+void Regular::destroy(int index)
+{
+    delete instances->at(index);
+    instances->removeAt(index);
 }

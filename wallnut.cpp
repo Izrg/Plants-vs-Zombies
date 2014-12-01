@@ -33,6 +33,12 @@ void Wallnut::advance(int phase)
     }
 }
 
+void Wallnut::destroy(int index)
+{
+    delete instances->at(index);
+    instances->removeAt(index);
+}
+
 void Wallnut::onPlant(myView *rMV)
 {
     mV = rMV;

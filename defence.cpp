@@ -14,3 +14,8 @@ void Defence::advance(int phase)
 {
 
 }
+
+void Defence::destroy(int index)
+{
+
+}

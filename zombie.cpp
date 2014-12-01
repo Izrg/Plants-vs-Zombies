@@ -15,3 +15,8 @@ int Zombie::getAttack()
 {
     return attack;
 }
+
+void Zombie::destroy(int index)
+{
+
+}

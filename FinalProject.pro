@@ -30,30 +30,27 @@ SOURCES += main.cpp\
     wallnut.cpp \
     chomper.cpp \
     snowpea.cpp \
-    cherrybomb.cpp
+    cherrybomb.cpp \
+    dirt.cpp \
+    fparcer.cpp \
+    flag.cpp \
+    conehead.cpp \
+    potatomine.cpp \
+    buckethead.cpp \
+    newspaper.cpp \
+    pausemenu.cpp \
+    repeater.cpp
 
 HEADERS  += mainwindow.h \
     maingame.h \
-    sun.h \
     myview.h \
-    plant.h \
-    defence.h \
-    attack.h \
-    sunflower.h \
-    peashooter.h \
-    zombie.h \
-    regular.h \
-    pvz.h \
-    grass.h \
     ref.h \
-    bullet.h \
-    wallnut.h \
-    chomper.h \
-    snowpea.h \
-    cherrybomb.h
+    fparcer.h \
+    pausemenu.h
 
 FORMS    += mainwindow.ui \
-    maingame.ui
+    maingame.ui \
+    pausemenu.ui
 
 RESOURCES += \
     Resources.qrc

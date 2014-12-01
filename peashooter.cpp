@@ -1,4 +1,5 @@
 #include "ref.h"
+extern QList<QList<QGraphicsPixmapItem*>*> *zombieGridList;
 
 Peashooter::Peashooter()
 {
@@ -16,6 +17,7 @@ Peashooter::Peashooter()
 
 
     rateMax = (int)((double)rate * 10);
+    rateCount = 0;
 }
 
 QString Peashooter::getImagePath()
@@ -26,8 +28,9 @@ QString Peashooter::getImagePath()
 void Peashooter::onPlant(myView *rMV)
 {
     mV = rMV;
-    rateCount = 0;
-    instances->back()->setData(RATE_INDEX, this->rateCount);
+
+    instances->back()->setData(RATE_INDEX, (this->rateCount - 1 + rateMax) % rateMax);
+
 
 }
 
@@ -38,10 +41,12 @@ void Peashooter::advance(int phase)
     //For each peashooter instance.
     for(int i = 0; i < instances->size(); i ++)
     {
-        if(mV->zombieGridList->at(instances->at(i)->data((PvZ::ROW_INDEX)).toInt())->isEmpty())
+        if(zombieGridList->at(instances->at(i)->data((PvZ::ROW_INDEX)).toInt())->isEmpty())
         {
             //Reset the zombie shooting
             instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+        }else{
+            instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
         }
 
         //If the plant is shooting...
@@ -52,15 +57,15 @@ void Peashooter::advance(int phase)
             {
                 mV->plantShoot(instances->at(i)->data(PvZ::PLANT_TYPE).toInt(),i,false); // Call the plant shoot method to shoot a bullet.
             }
-            continue;
-        }
-        for(int j=0; j < (mV->zombieGridList->at(instances->at(i)->data((PvZ::ROW_INDEX)).toInt())->size()); j++)
-        {
-            if(mV->zombieGridList->at(j) <= 0) continue;
-            instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
         }
 
     }
 
     ++rateCount %= rateMax;
+}
+
+void Peashooter::destroy(int index)
+{
+    delete instances->at(index);
+    instances->removeAt(index);
 }

@@ -1,30 +1,27 @@
 #include "ref.h"
 extern QList<QList<QGraphicsPixmapItem*>*> *zombieGridList;
 
-Snowpea::Snowpea()
+Repeater::Repeater()
 {
     //Set up the peashooter stats.
-    this->cost = 175;
+    this->cost = 200;
     this->life = 4;
     this->range = 9999;
-    this->damage = 1;
+    this->damage = 2;
     this->rate = 1.5;
     this->seeding = 7.5;
-    this->slow = true;
+    this->slow = false;
 
-    rateCount = 0;
+    name = "Repeater";
+    setPixmap(QPixmap(":/Plants/Repeater.png").scaled(W,W));
 
     rateMax = (int)((double)rate * 10);
-
-    name = "Snow Pea";
-    setPixmap(QPixmap(":/Plants/SnowPea.png").scaled(W,W));
-
+    rateCount = 0;
 }
 
-void Snowpea::advance(int phase)
+void Repeater::advance(int phase)
 {
     if(!phase) return;
-
     //For each peashooter instance.
     for(int i = 0; i < instances->size(); i ++)
     {
@@ -32,22 +29,18 @@ void Snowpea::advance(int phase)
         {
             //Reset the zombie shooting
             instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+        }else{
+            instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
         }
+
         //If the plant is shooting...
         if(instances->at(i)->flags().testFlag(QGraphicsItem::ItemIsMovable))
         {
             //CHANGE THE RATE AT WHICH BULLETS ARE SHOT
             if(instances->at(i)->data(PvZ::RATE_INDEX).toInt() == this->rateCount)
             {
-                mV->plantShoot(instances->at(i)->data(PvZ::PLANT_TYPE).toInt(),i,true); // Call the plant shoot method to shoot a bullet.
+                mV->plantShoot(instances->at(i)->data(PvZ::PLANT_TYPE).toInt(),i,false); // Call the plant shoot method to shoot a bullet.
             }
-            continue;
-        }
-        //For all the zombies in the current plants row.
-        for(int j=0; j < (zombieGridList->at(instances->at(i)->data((PvZ::ROW_INDEX)).toInt())->size()); j++)
-        {
-            if(zombieGridList->at(j) <= 0) continue;
-            instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
         }
 
     }
@@ -55,15 +48,15 @@ void Snowpea::advance(int phase)
     ++rateCount %= rateMax;
 }
 
-void Snowpea::onPlant(myView *rMV)
-{
-    mV = rMV;
-    instances->back()->setData(RATE_INDEX, (this->rateCount - 1) % rateMax);
-
-}
-
-void Snowpea::destroy(int index)
+void Repeater::destroy(int index)
 {
     delete instances->at(index);
     instances->removeAt(index);
+}
+
+void Repeater::onPlant(myView *rMV)
+{
+    mV = rMV;
+
+    instances->back()->setData(RATE_INDEX, (this->rateCount - 1 + rateMax) % rateMax);
 }

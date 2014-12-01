@@ -23,8 +23,27 @@
         <file>SnowPea.png</file>
         <file>SnowBullet.png</file>
         <file>Cherrybomb.gif</file>
+        <file>PotatoReady.gif</file>
+        <file>PotatoPlant.png</file>
+        <file>Repeater.png</file>
     </qresource>
     <qresource prefix="/Zombies">
         <file>Regular.gif</file>
+        <file>FlagZombie.png</file>
+        <file>Conehead.png</file>
+        <file>Buckethead.png</file>
+        <file>Newspaper.gif</file>
+    </qresource>
+    <qresource prefix="/Dirt">
+        <file>Dirt.PNG</file>
+    </qresource>
+    <qresource prefix="/Shovel">
+        <file>Shovel.png</file>
+    </qresource>
+    <qresource prefix="/Menu">
+        <file>StartButton.png</file>
+        <file>UsernameScreen.png</file>
+        <file>ChangeUser.png</file>
+        <file>Menu.png</file>
     </qresource>
 </RCC>

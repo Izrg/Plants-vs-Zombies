@@ -37,9 +37,11 @@ public:
     myView *mV;
 
     QList<QGraphicsPixmapItem*>* instances;
+    virtual void destroy(int index);
+
 
 };
-
+//GRASS
 class Grass : public PvZ
 {
 public:
@@ -48,19 +50,23 @@ public:
 private:
     QPixmap* otherGrass;
 };
+//DIRT
+class Dirt : public PvZ
+{
+public:
+    Dirt();
+    QPixmap *getDirt();
+};
 
 class Sun : public PvZ
 {
 public:
-    Sun(myView *rmV);
-
-    enum {W= 35};
+    Sun(int H);
+    int gameBoardHeight;
+    enum {W= 35, isFalling = 0, endRow = 1};
     void advance(int phase);
     void onCreate(bool falling, int endingRow);
-
-    QList<bool> *isFalling;
-    QList<int> *endRow;
-
+    void destroy(int index);
 };
 
 class Plant : public PvZ
@@ -77,7 +83,7 @@ public:
     int getLife();
     void setLife(int newLife);
     bool inRange;
-
+    virtual void destroy(int index);
     QList<int>* INSTANCE_LIFE;
     QList<int>* counter; // used to keep track of plant actions.
 
@@ -109,6 +115,7 @@ public:
     GraphicsItemFlag isEating;
     enum{COMMON_FACTOR = 10};
     virtual void onSpawn(myView *rMV) = 0;
+    virtual void destroy(int index);
 };
 
 class Attack : public Plant
@@ -124,6 +131,7 @@ public slots:
     bool zombieInRange;
     QRectF* rangeRect;
     QGraphicsItem *tempItem;
+    virtual void destroy(int index);
 };
 
 class Bullet : public PvZ
@@ -133,6 +141,7 @@ public:
     enum {W= 15};
     int speed;
     QPixmap *getBullet(bool slow);
+    void destroy(int index);
 private:
     QPixmap* snowBullet;
 
@@ -148,7 +157,7 @@ public:
     Defence();
     void onPlant(myView *rMV);
     void advance(int phase);
-
+    virtual void destroy(int index);
     int splash;
     bool bomb;
     bool sun;
@@ -160,6 +169,8 @@ class Sunflower : public Defence
 public:
     Sunflower();
     void advance(int phase);
+    void destroy(int index);
+
     ~Sunflower();
     // Plant interface
 public:
@@ -178,6 +189,7 @@ public:
     enum {W=50};
     void advance(int phase);
     void onPlant(myView *rMV);
+    void destroy(int index);
 
 };
 
@@ -188,6 +200,7 @@ public:
     Snowpea();
     enum {W=50};
     void onPlant(myView *rMV);
+    void destroy(int index);
 
     // QGraphicsItem interface
 public:
@@ -202,6 +215,7 @@ public:
     Wallnut();
     enum{W=50}; //size for the Wallnut pixmap
     void advance(int phase);
+    void destroy(int index);
 
     // Plant interface
 public:
@@ -215,7 +229,7 @@ public:
     Chomper();
     enum{W=50}; //size for the Wallnut pixmap
     void advance(int phase);
-
+    void destroy(int index);
     // Plant interface
 public:
     void onPlant(myView *rMV);
@@ -227,6 +241,7 @@ class Peashooter : public Attack
 public:
     Peashooter();
     void advance(int phase);
+    void destroy(int index);
 
     // Plant interface
 public:
@@ -235,7 +250,28 @@ public:
 public:
     void onPlant(myView *rMV);
 };
+//*-----------PotatoMine-------*
+class PotatoMine : public Defence
+{
+public:
+    PotatoMine();
+    enum{W=50}; //size for the Potatomine pixmap
+    void advance(int phase);
+    void destroy(int index);
+    void onPlant(myView *rMV);
+};
+//*---------Repeater------------*
+class Repeater : public Attack
+{
+public:
+    Repeater();
+    enum{W=50}; //size for the Potatomine pixmap
+    void advance(int phase);
+    void destroy(int index);
+    void onPlant(myView *rMV);
+};
 
+//*------------Regular-------*
 class Regular : public Zombie
 {
 public:
@@ -245,6 +281,50 @@ public:
 
     void advance(int phase); //advance function for the zombie.
     void onSpawn(myView *rMV);
+    void destroy(int index);
 };
+//*----------FLAG-----------*
+class Flag : public Zombie
+{
+public:
+    Flag();
+    enum{W=50}; //size for the zombie pixmap
 
+    void advance(int phase); //advance function for the zombie.
+    void onSpawn(myView *rMV);
+    void destroy(int index);
+};
+//*---------Conehead-------*
+class Conehead : public Zombie
+{
+public:
+    Conehead();
+    enum{W=50}; //size for the zombie pixmap
+
+    void advance(int phase); //advance function for the zombie.
+    void onSpawn(myView *rMV);
+    void destroy(int index);
+};
+//*--------Buckethead----------*
+class Buckethead : public Zombie
+{
+public:
+    Buckethead();
+    enum{W=50}; //size for the zombie pixmap
+
+    void advance(int phase); //advance function for the zombie.
+    void onSpawn(myView *rMV);
+    void destroy(int index);
+};
+//*-----------Newspaper------*
+class Newspaper : public Zombie
+{
+public:
+    Newspaper();
+    enum{W=50}; //size for the zombie pixmap
+
+    void advance(int phase); //advance function for the zombie.
+    void onSpawn(myView *rMV);
+    void destroy(int index);
+};
 #endif // REF_H

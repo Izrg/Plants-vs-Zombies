@@ -22,6 +22,7 @@ class mainGame;
 class Sun;
 class Bullet;
 class Grass;
+class Dirt;
 class Zombie;
 class Regular;
 class QGraphicsScene;
@@ -39,12 +40,13 @@ public:
 
     //Lists for Zombies
     QList <Zombie*> *zombieObj; //Holds the "parent" class
-    QList<QList<QGraphicsPixmapItem*>*> *zombieGridList; //Holds references to the children being drawn
+     //Holds references to the children being drawn
     //Level Params ?
 
 
     int maxZombies; // Holds the max number of zombies for this level.
     int currentZombies; // Holds the number of zombies spawned so far.
+    int zombieSequenceIndex;
 
     //Initilize Suns.
     Sun *sun;
@@ -55,12 +57,12 @@ public:
     QGraphicsScene *scene; // The graphics scene.
 
     enum {ROWS = 5, COLUMNS = 10};
-    enum{COMMON_FACTOR = 10}; // Common factor used between classes.
 
     QRectF grid[ROWS][COLUMNS];
     QGraphicsPixmapItem *plantGrid [ROWS][COLUMNS];
 
     Grass *grass;
+    Dirt *dirt;
 
     QSignalMapper* mapper; //For mapping signals -> let's us pass values to slots
     QSignalMapper* zombieMapper; //For mapping signals -> let's us pass values to slots
@@ -73,19 +75,19 @@ public:
 
     void zombieEat(int,int); // Called when the zombie eats plant brains.
     void plantShoot(int,int,bool);
-    void damageZombie(int zombieObject,int zombieInstance,int damage, bool slow);
+    void damageZombie(int zombieObject,int zombieInstance, int zombieGridInstance, int damage, bool slow);
+    void destroyPlant(int row, int column);
+
+    QTimer *moveTimer;
+    QTimer *sunTimer;
+    QTimer *zombieSpawnTimer;
 public slots:
     void sunSpawn(QObject*);
+    void sunflowerSun();
     void zombieSpawner();
     // QWidget interface
 protected:
     void mousePressEvent(QMouseEvent *event);
-
-private:
-    QTimer *sunflowerTimer;
-    QTimer *moveTimer;
-    QTimer *sunTimer;
-    QTimer *zombieSpawnTimer;
 
 };
 

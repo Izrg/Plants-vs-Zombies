@@ -2,28 +2,46 @@
 #include <qdebug.h>
 #include <QMouseEvent>
 
+extern QList<QObject*> *flowerSuns;
+extern QList<QList<QGraphicsPixmapItem*>*> *zombieGridList = new QList<QList<QGraphicsPixmapItem*>*>();
+
 myView::myView(QWidget *parent, mainGame *rMG) :
     QGraphicsView(parent)
 {
+    //Set up the game board.
+    WIDTH = parent->width();
+    HEIGHT = parent->height();
+
+    //Set the main game object to the maingame class instance
+    mG = rMG;
+
     //Initialize Game Objects
     zombieObj = new QList<Zombie*>();
 
     zombieObj->append(new Regular());
+    zombieObj->append(new Flag());
+    zombieObj->append(new Conehead());
+    zombieObj->append(new Buckethead());
+    zombieObj->append(new Newspaper());
     //...
 
-    zombieGridList = new QList<QList<QGraphicsPixmapItem*>*>();
+
     for (int i = 0; i < ROWS; i++) zombieGridList->append(new QList<QGraphicsPixmapItem*>());
 
-    maxZombies = 2; // Set the max number of zombies.
+
+
+
+    maxZombies = mG->maxZombies; // Set the max number of zombies.
+    //maxZombies = 2;
     currentZombies = 0; // No zombies spawned yet.
-
+    zombieSequenceIndex = 0; //Stores the sequence index of the zombies.
+    //The gambe board tiles.
     grass = new Grass();
+    dirt = new Dirt();
 
-    sun = new Sun(this);
+    sun = new Sun(HEIGHT/ROWS);
     bullet = new Bullet(this);
 
-    //Set the main game object to the maingame class instance
-    mG = rMG;
 
     //Set up the scene
     scene = new QGraphicsScene(this);
@@ -53,6 +71,7 @@ myView::myView(QWidget *parent, mainGame *rMG) :
 
     //Start the move timer to control movement.
     connect(moveTimer, SIGNAL(timeout()), scene, SLOT(advance()));
+    connect(moveTimer, SIGNAL(timeout()), this, SLOT(sunflowerSun()));
 
     //Start the sun timer, which controls when suns spawn.
     connect(sunTimer, SIGNAL(timeout()), mapper, SLOT(map()));
@@ -67,10 +86,6 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     moveTimer->start(100);
     zombieSpawnTimer->start(5000);
 
-    //Set up the game board.
-    WIDTH = parent->width();
-    HEIGHT = parent->height();
-
     //Set the size of the screen.
     QRectF rect(0,0,WIDTH,HEIGHT);
     setSceneRect(rect);
@@ -79,20 +94,41 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     gameBlockHeight = HEIGHT/ROWS;
     gameBlockWidth = WIDTH/COLUMNS;
 
-    //Set up intial step counters
-    for(int i = 0; i < ROWS; i ++){
-        for (int j = 0; j < COLUMNS; j++){
-            QGraphicsPixmapItem* g = scene->addPixmap(*grass->getGrass((i%2 == j%2)));
-            g->setPos(j*gameBlockWidth, i*gameBlockHeight);
+    //Set up the grass
+    for(int i = 0; i < ROWS; i ++)
+    {
+        //Based on the active rows, put grass or dirt
+        if((mG->activeRow == 1 && i == 2) || (mG->activeRow == 3 && (i == 1 || i == 2 || i == 3)) || mG->activeRow == 5)
+        {
+            for (int j = 0; j < COLUMNS; j++)
+            {
+                QGraphicsPixmapItem* g = scene->addPixmap(*grass->getGrass((i%2 == j%2)));
+                g->setPos(j*gameBlockWidth, i*gameBlockHeight);
 
-            //Add the new rectangle to the array to hold the grid.
-            grid[i][j] = QRectF(g->pos(), QSize(gameBlockWidth, gameBlockHeight));
-            plantGrid[i][j] = NULL;
+                //Add the new rectangle to the array to hold the grid.
+                grid[i][j] = QRectF(g->pos(), QSize(gameBlockWidth, gameBlockHeight));
+                plantGrid[i][j] = NULL;
+            }
+        }else
+        {
+            //Put dirt if this isnt an active row.
+            for (int j = 0; j < COLUMNS; j++)
+            {
+
+                QGraphicsPixmapItem* g = scene->addPixmap(*dirt->getDirt());
+                g->setPos(j*gameBlockWidth, i*gameBlockHeight);
+
+                //Add the new rectangle to the array to hold the grid.
+                grid[i][j] = QRectF(g->pos(), QSize(gameBlockWidth, gameBlockHeight));
+                //This are in the grrid is false as there is dirt.
+                plantGrid[i][j] = dirt;
+            }
         }
+
     }
 
     sun->instances->append(scene->addPixmap(sun->pixmap()));
-    sun->instances->back()->setPos(random(0, COLUMNS - 1) * gameBlockWidth + gameBlockWidth/4, 0);
+    sun->instances->back()->setPos(random(0, COLUMNS - 1) * gameBlockWidth + gameBlockWidth/4,0);
     sun->onCreate(true, random(0, ROWS - 1));
 }
 
@@ -106,16 +142,28 @@ int myView::random(int x1, int x2)
 void myView::sunSpawn(QObject *rPoint)
 {
     QPointF* p = (QPointF*)rPoint;
-    int column;
     bool falling;
     //checks if the sun is falling or if it is being placed on a sunflower.
-    if(falling = (p->x() == -1)) p = new QPointF((random(0, ROWS - 1)),(random(0, COLUMNS - 1)));
-    //row = p->x() * gameBlockHeight +(gameBlockHeight/4);
-    column = p->y() * gameBlockWidth + (gameBlockWidth/4);
-    //qDebug() << falling << endl;
+    if(falling = (p->x() == -1))
+    {
+        p = new QPointF((random(0, ROWS - 1)),(random(0, COLUMNS - 1)));
+        p->setX(p->x() * gameBlockHeight);
+        p->setY(p->y() * gameBlockWidth);
+    }
+    p->setX(p->x() + (gameBlockHeight/4));
+    p->setY(p->y() + (gameBlockWidth/4));
     sun->instances->append(scene->addPixmap(sun->pixmap()));
-    sun->instances->back()->setPos(column, 0);
+    sun->instances->back()->setPos(p->y(), falling ? 0 : p->x());
     sun->onCreate(falling, random(0, ROWS - 1));
+}
+
+void myView::sunflowerSun()
+{
+    while(!flowerSuns->isEmpty())
+    {
+        sunSpawn(flowerSuns->back());
+        flowerSuns->pop_back();
+    }
 }
 
 //This method is called when zombies eat plant brains.
@@ -141,26 +189,17 @@ void myView::zombieEat(int zombieObjectIndex, int zombieInstanceIndex)
             {
                 int plantObjectIndex = (plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i])->data(PvZ::PLANT_TYPE).toInt();
                 int plantInstanceIndex = (plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i])->data(PvZ::INSTANCE_INDEX).toInt();
-                //qDebug() << "Plant object Index: " << plantObjectIndex << endl;
-                //qDebug() << "plant Instance Index: " << plantInstanceIndex << endl;
+
                 //Set the plant grid location to NULL
                 plantGrid[zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt()][i] = NULL;
                 //Delete this plant.
-                //Reset the zombies flag
-                delete plantObj->at(plantObjectIndex)->instances->at(plantInstanceIndex);
-                plantObj->at(plantObjectIndex)->instances->removeAt(plantInstanceIndex);
+                //Destroy this plant instance.
+                plantObj->at(plantObjectIndex)->destroy(plantInstanceIndex);
 
-                //Go through all the plant objects of the type of plant that was just deleted.
-                for(int j = 0; j < plantObj->at(plantObjectIndex)->instances->size(); j++)
-                {
-                    int temp;
-                    //If a specific instance of the plant is larger than the one just erased, push it back 1.
-                    if((temp = plantObj->at(plantObjectIndex)->instances->at(j)->data(PvZ::INSTANCE_INDEX).toInt()) > plantInstanceIndex)
-                    {
-                        plantObj->at(plantObjectIndex)->instances->at(j)->setData(PvZ::INSTANCE_INDEX,QVariant(temp - 1));
-                    }
-                }
-                zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->setFlag(QGraphicsItem::ItemIsMovable,false);
+                //Update instances
+                for(int j = 0; j < mG->plantObj->at(plantObjectIndex)->instances->size(); j++) mG->plantObj->at(plantObjectIndex)->instances->at(j)->setData(PvZ::INSTANCE_INDEX, j);
+                //Reset the zombie flag.
+                //zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->setFlag(QGraphicsItem::ItemIsMovable,false);
                 return;
             }
             //Set the new health of the plant.
@@ -180,11 +219,13 @@ void myView::plantShoot(int plantObjectType, int plantInstanceIndex, bool slow)
     bullet->instances->back()->setData(PvZ::INSTANCE_INDEX,QVariant(plantObj->at(plantObjectType)->instances->at(plantInstanceIndex)->data(PvZ::INSTANCE_INDEX).toInt()));
 }
 
-void myView::damageZombie(int zombieObjectIndex, int zombieInstanceIndex,int damage, bool slow)
+void myView::damageZombie(int zombieObjectIndex, int zombieInstanceIndex, int zombieGridInstance, int damage, bool slow)
 {
     int tempLife = zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::INSTANCE_LIFE).toInt();
+    int row = zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt();
     tempLife -= damage;
-
+    //qDebug() << "Zombie Object: " << zombieObjectIndex << endl;
+    //qDebug() << "Zombie Instance: " << zombieInstanceIndex << endl;
     if(slow)
     {
         //Check a zombie slowed flag.
@@ -201,25 +242,29 @@ void myView::damageZombie(int zombieObjectIndex, int zombieInstanceIndex,int dam
         }
     }
 
+
     if(tempLife <= 0)
     {
-        //Remove the zombie from the gridlist.
-        zombieGridList->at(zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt())->removeAt(zombieInstanceIndex);
-        //Go through the zombies and decrement their instance by 1 as a zombie was just killed.
-        for(int j = 0; j < zombieObj->at(zombieObjectIndex)->instances->size(); j++)
-        {
-            int temp;
-            //If a specific instance of the zombie is larger than the one just erased, push it back 1.
-            qDebug() << "Next zombie instance : " << zombieObj->at(zombieObjectIndex)->instances->at(j)->data(PvZ::INSTANCE_INDEX).toInt() << endl;
-            if((temp = zombieObj->at(zombieObjectIndex)->instances->at(j)->data(PvZ::INSTANCE_INDEX).toInt()) > zombieInstanceIndex)
-            {
-                temp --;
-                zombieObj->at(zombieObjectIndex)->instances->at(j)->setData(PvZ::INSTANCE_INDEX,QVariant(temp));
-            }
-        }
+        //Remove from scene
+        scene->removeItem(zombieGridList->at(row)->at(zombieGridInstance));
+
+        //Delete the object in the heap
         delete zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex);
         zombieObj->at(zombieObjectIndex)->instances->removeAt(zombieInstanceIndex);
-        //Go through all the plant objects of the type of plant that was just deleted.
+
+        //Remove the zombie from the gridlist.
+        qDebug() << "Row: " <<  row << endl;
+        qDebug() << "Size Before: " << zombieGridList->at(row)->size() << endl;
+        zombieGridList->at(row)->removeAt(zombieGridInstance);
+        qDebug() << "Size After: " << zombieGridList->at(row)->size() << endl;
+
+        //zombieGridList->at(zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt())
+        //Destroy this zombie instance.
+        //zombieObj->at(zombieObjectIndex)->destroy(zombieInstanceIndex);
+
+        //Update instances
+        for(int j = 0; j < zombieObj->at(zombieObjectIndex)->instances->size(); j++) zombieObj->at(zombieObjectIndex)->instances->at(j)->setData(PvZ::INSTANCE_INDEX, j);
+
         return;
 
     }
@@ -227,18 +272,41 @@ void myView::damageZombie(int zombieObjectIndex, int zombieInstanceIndex,int dam
     zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->setData(PvZ::INSTANCE_LIFE,QVariant(tempLife));
 
 }
+
+void myView::destroyPlant(int row, int column)
+{
+    scene->removeItem(plantGrid[row][column]);
+    int obj = plantGrid[row][column]->data(PvZ::PLANT_TYPE).toInt();
+    (mG->plantObj->at(obj))->destroy(plantGrid[row][column]->data(PvZ::INSTANCE_INDEX).toInt());
+    plantGrid[row][column] = NULL;
+
+    //Update instances
+    for(int i = 0; i < mG->plantObj->at(obj)->instances->size(); i++) mG->plantObj->at(obj)->instances->at(i)->setData(PvZ::INSTANCE_INDEX, i);
+
+}
 //This is called to spawn zombies.
 void myView::zombieSpawner()
 {
     currentZombies ++; // One more zombie has spawned.
+    int row;
     //If the max zombies hasnt been reached yet...
     if(currentZombies <= maxZombies)
     {
 
         //Add a new zombie.
-        int WHICH_ZOMBIE = 0;
+        int WHICH_ZOMBIE = (mG->sequence.at(zombieSequenceIndex) - 1); // Spawn the zombie of type from the given sequence.
+        //int WHICH_ZOMBIE = 4;
+        zombieSequenceIndex ++; // Increement the sequence index
+
         zombieObj->at(WHICH_ZOMBIE)->instances->append(scene->addPixmap(zombieObj->at(WHICH_ZOMBIE)->pixmap()));
-        int row = random(0, ROWS - 1);
+        if(mG->activeRow == 1)
+        {
+           row = random(2, 2);
+        }else if(mG->activeRow == 3)
+        {
+            row = random(1, 3);
+        }else row = random(0, ROWS - 1);
+
         zombieGridList->at(row)->append(zombieObj->at(WHICH_ZOMBIE)->instances->back());
         //Saves the zombie type to the zombie grid list.
         zombieGridList->at(row)->back()->setData(PvZ::ZOMBIE_TYPE,QVariant(WHICH_ZOMBIE));
@@ -251,13 +319,8 @@ void myView::zombieSpawner()
         zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::CLASS_TYPE,QVariant('Z'));
         //Set the zombie instance.
         zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::INSTANCE_INDEX,QVariant(zombieObj->at(WHICH_ZOMBIE)->instances->size() - 1));
-        /*
-         * TODO:
-         * NEED TO CHANGE THE "ZOMBIE TYPE" TO BE WHATEVER ZOMBIE HAS SPAWNED
-         * E.G, 0 = Regular Zombie, 1 = Conehead, etc...
-         *
-         */
-        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::ZOMBIE_TYPE,QVariant(0));
+
+        zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::ZOMBIE_TYPE,QVariant(WHICH_ZOMBIE));
         //Set the zombie ='s rate index instance to 0;
         zombieObj->at(WHICH_ZOMBIE)->instances->back()->setData(PvZ::RATE_INDEX,QVariant(0));
         //Add the row of the current zombie instance to the Row index
@@ -269,6 +332,11 @@ void myView::zombieSpawner()
 
         //Call zombie on spawn function.
         zombieObj->at(WHICH_ZOMBIE)->onSpawn(this);
+    }else
+    {
+        for(int i = 0; i < ROWS; i++) if(!zombieGridList->at(i)->isEmpty()) return;
+        mG->levelWon(); // Call the level won function.
+
     }
 }
 
@@ -276,7 +344,29 @@ void myView::zombieSpawner()
 void myView::mousePressEvent(QMouseEvent *event)
 {
     int range = Sun::W;
+    //Called if the user has the shovel.
+    if(mG->plantSelected ==-2)
+    {
+        //Convert Point from mouse into COLUMN, ROW
+        QPoint gridCoords = event->pos();
+        int c = -1;
+        for (int v = gridCoords.x(); v > 0; c++) v -= gameBlockWidth;
+        gridCoords.setX(c);
+        c = -1;
+        for (int v = gridCoords.y(); v > 0; c++) v -= gameBlockHeight;
+        gridCoords.setY(c);
 
+        if(plantGrid[gridCoords.y()][gridCoords.x()] != NULL)
+        {
+            destroyPlant(gridCoords.y(), gridCoords.x());
+            if(!mG->shovelLock)
+            {
+                mG->plantSelected = -1;
+                QWidget::setCursor(Qt::ArrowCursor);
+            }
+        }
+        return;
+    }
     //If the user has selected to plant a plant
     if(mG->plantSelected > -1)
     {
@@ -285,7 +375,7 @@ void myView::mousePressEvent(QMouseEvent *event)
             for(int j = 0; j < COLUMNS; j++)
             {
                 //If the user clicks within a grid item AND that grid item isnt filled...
-                if(grid[i][j].contains(event->pos()) && (plantGrid[i][j] == NULL)){
+                if(grid[i][j].contains(event->pos()) && (plantGrid[i][j] == NULL) ){
                     // Plant the new plant.
                     mG->plantObj->at(mG->plantSelected)->instances->append(plantGrid[i][j] = scene->addPixmap(mG->plantObj->at(mG->plantSelected)->pixmap()));
                     mG->plantObj->at(mG->plantSelected)->instances->back()->setPos(j * gameBlockWidth, i * gameBlockHeight);
@@ -332,16 +422,20 @@ void myView::mousePressEvent(QMouseEvent *event)
         }
         //If the user is currently not planting a plant.
     }else{
-
-        for(int i = 0; i < sun->instances->size(); i++)
+        int size = sun->instances->size();
+        for(int i = 0; i < size; i++)
         {
-            if((qAbs(event->pos().x() - sun->instances->at(i)->pos().x()) <= range) && (qAbs(event->pos().y() - sun->instances->at(i)->pos().y()) <= range))
+
+            if(QRectF(sun->instances->at(i)->pos(), QSize(Sun::W, Sun::W)).contains(event->pos()))
             {
                 mG->addSunPoints();
-                delete sun->instances->at(i);
-                sun->instances->removeAt(i--);
+                scene->removeItem(sun->instances->at(i));
+                sun->destroy(i--);
+                size --;
+
             }
         }
+        return;
     }
 
 }

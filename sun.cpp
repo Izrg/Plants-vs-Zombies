@@ -1,23 +1,28 @@
 #include "ref.h"
 #include <QDebug>
-Sun::Sun(myView *rmV)
+Sun::Sun(int H)
 {
     gametype = 'S';
     name = "Sun";
 
-    mV = rmV;
+    gameBoardHeight = H;
 
     //Load sun image, and make it WxW
     setPixmap(QPixmap(":/sun/Sun.png").scaled(W,W));
-
-    isFalling = new QList<bool>();
-    endRow = new QList<int>();
 }
 
 void Sun::onCreate(bool falling, int endingRow)
 {
-    isFalling->append(falling);
-    endRow->append(endingRow);
+    instances->back()->setData(isFalling, falling);
+    //qDebug() << falling << endl;
+    instances->back()->setData(endRow, endingRow);
+    //qDebug() << endingRow << endl;
+
+}
+void Sun::destroy(int index)
+{
+    delete instances->at(index);
+    instances->removeAt(index);
 }
 
 void Sun::advance(int phase)
@@ -27,9 +32,16 @@ void Sun::advance(int phase)
     for(int i = 0; i < instances->size(); i++)
     {
         //Is the sun not falling?
-        if(!isFalling->at(i)) continue;
-        else if(instances->at(i)->pos().y() >= endRow->at(i) * mV->gameBlockHeight + mV->gameBlockHeight/4) isFalling->replace(i, false);
-        else instances->at(i)->setY(instances->at(i)->pos().y() + 5);
+        //qDebug() << instances->at(i)->data(isFalling).toBool() << " : " << instances->at(i)->data(endRow).toInt() << " ;; " << instances->at(i)->pos().y() << endl;
+        if(!(instances->at(i)->data(isFalling)).toBool()){
+            continue;
+        }
+        else if(instances->at(i)->pos().y() >= instances->at(i)->data(endRow).toInt() * gameBoardHeight + gameBoardHeight/4){
+            instances->at(i)->setData(isFalling, false);
+        }
+        else {
+            instances->at(i)->setY(instances->at(i)->pos().y() + 5);
+        }
     }
 }
 
