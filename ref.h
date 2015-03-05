@@ -163,7 +163,22 @@ public:
     bool sun;
     bool need;
 };
+//*---- LAWNMOWER--------*
+class Lawnmower : public Attack
+{
+public:
+    enum {W=50};
+    QPixmap *getLawnmower();
+    Lawnmower();
+    void destroy(int index);
+    void onPlant(myView *rMV);
 
+    // QGraphicsItem interface
+public:
+    void advance(int phase);
+};
+
+//-------------SUNFLOWER---------
 class Sunflower : public Defence
 {
 public:

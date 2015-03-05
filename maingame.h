@@ -67,6 +67,7 @@ public:
     bool isPaused;
     QSignalMapper* mapper; //For mapping signals -> Allows passing of values to SLOTs
     void levelWon();
+    void levelLost();
 public slots:
     void onPlantButtonClicked(int);
     void on_shovelButton_clicked();

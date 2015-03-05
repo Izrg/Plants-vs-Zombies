@@ -27,6 +27,8 @@ public:
     mainGame *mG;
     QString lastUser;
     void restartGame();
+    void loseGame();
+
 
 private slots:
     void on_startBtn_clicked();

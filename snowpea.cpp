@@ -32,22 +32,18 @@ void Snowpea::advance(int phase)
         {
             //Reset the zombie shooting
             instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+        }else{
+            instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
         }
+
         //If the plant is shooting...
         if(instances->at(i)->flags().testFlag(QGraphicsItem::ItemIsMovable))
         {
             //CHANGE THE RATE AT WHICH BULLETS ARE SHOT
             if(instances->at(i)->data(PvZ::RATE_INDEX).toInt() == this->rateCount)
             {
-                mV->plantShoot(instances->at(i)->data(PvZ::PLANT_TYPE).toInt(),i,true); // Call the plant shoot method to shoot a bullet.
+                mV->plantShoot(instances->at(i)->data(PvZ::PLANT_TYPE).toInt(),i,false); // Call the plant shoot method to shoot a bullet.
             }
-            continue;
-        }
-        //For all the zombies in the current plants row.
-        for(int j=0; j < (zombieGridList->at(instances->at(i)->data((PvZ::ROW_INDEX)).toInt())->size()); j++)
-        {
-            if(zombieGridList->at(j) <= 0) continue;
-            instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
         }
 
     }

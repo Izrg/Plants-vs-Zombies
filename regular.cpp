@@ -1,5 +1,6 @@
 #include "ref.h"
 #include <QDebug>
+#include <QMessageBox>
 
 Regular::Regular()
 {
@@ -23,14 +24,7 @@ void Regular::advance(int phase)
     if(!phase) return;
 
     for (int i = 0; i < instances->size(); i++)
-    {   /*
-        //The zombie moves if there is nothing at its position.
-        int c = -1;
-        for (int v = instances->at(i)->pos().y(); v > 0; c++) v -= mV->gameBlockWidth;
-        if(mV->plantGrid[instances->at(i)->data(ROW_INDEX).toInt()][c] == NULL)
-        {
-            instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
-        }*/
+    {
 
         for(int j = 0; j < mV->COLUMNS; j++)
         {
@@ -41,6 +35,7 @@ void Regular::advance(int phase)
                 continue;
             }
             //If the zombie collides with a plant, set a flag and return.
+            //CRASHES HERE WITH LAWNMOWERS.
             else if(instances->at(i)->collidesWithItem(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j]))
             {
                 //Set flag.
@@ -68,11 +63,12 @@ void Regular::advance(int phase)
             instances->removeAt(i--);
             //TODO
             //Probably add your END GAME thing here
-            continue;
+            QMessageBox::information(mV->mG,"LOSER", "THE ZOMBIES ATE YOUR BRAINS!");
+            //mV->levelLost();
+            return;
         }
 
-        //Chekc if the zombie hits a plant
-        //Go through each column of the current row.
+
     }
     ++rateCount %= rateMax;
 }

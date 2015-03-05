@@ -1,4 +1,6 @@
 #include "ref.h"
+#include <QMessageBox>
+
 extern QList<QList<QGraphicsPixmapItem*>*> *zombieGridList;
 
 Buckethead::Buckethead()
@@ -22,6 +24,25 @@ void Buckethead::advance(int phase)
 
     for (int i = 0; i < instances->size(); i++)
     {
+
+        for(int j = 0; j < mV->COLUMNS; j++)
+        {
+            //instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+            //If there is no plant in the current column, continue.
+            if(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j] == NULL) {
+                instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,false);
+                continue;
+            }
+            //If the zombie collides with a plant, set a flag and return.
+            //CRASHES HERE WITH LAWNMOWERS.
+            else if(instances->at(i)->collidesWithItem(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j]))
+            {
+                //Set flag.
+                instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
+                break;
+            }
+        }
+
         if(instances->at(i)->flags().testFlag(QGraphicsItem::ItemIsMovable))
         {
             //Check for rate of attack. TODO: SOME SERIOUS MATH!!
@@ -31,6 +52,9 @@ void Buckethead::advance(int phase)
             continue;
         }
 
+        //Move the zombie
+        instances->at(i)->setX(instances->at(i)->pos().x() - instances->at(i)->data(Z_SPEED).toDouble());
+
         //Remove if offscreen
         if(instances->at(i)->pos().x() + pixmap().width() <= 0)
         {
@@ -38,26 +62,11 @@ void Buckethead::advance(int phase)
             instances->removeAt(i--);
             //TODO
             //Probably add your END GAME thing here
-            continue;
+            QMessageBox::information(mV->mG,"LOSER", "THE ZOMBIES ATE YOUR BRAINS!");
+            //mV->levelLost();
+            return;
         }
 
-        //Move the zombie
-        instances->at(i)->setX(instances->at(i)->pos().x() - instances->at(i)->data(Z_SPEED).toDouble());
-        //Chekc if the zombie hits a plant
-
-        //Go through each column of the current row.
-        for(int j = 0; j < mV->COLUMNS; j++)
-        {
-            //If there is no plant in the current column, continue.
-            if(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j] == NULL) continue;
-            //If the zombie collides with a plant, set a flag and return.
-            if(instances->at(i)->collidesWithItem(mV->plantGrid[instances->at(i)->data(PvZ::ROW_INDEX).toInt()][j]))
-            {
-                //Set flag.
-                instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
-                return;
-            }
-        }
 
     }
     ++rateCount %= rateMax;

@@ -7,7 +7,7 @@ Chomper::Chomper()
     this->life = 4;
     this->range = 1;
     this->damage = 150;
-    this->rate = 5;
+    this->rate = 42;
     this->seeding = 7.5;
     this->slow = false;
 

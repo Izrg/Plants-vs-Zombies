@@ -7,7 +7,7 @@ Sunflower::Sunflower()
     this->cost = 50;
     this->life = 4;
     this->range = 0;
-    this->rate = 5;
+    this->rate = 24;
     this->damage = 0;
     this->bomb = false;
     this->seeding = 7.5;

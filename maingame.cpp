@@ -140,7 +140,11 @@ void mainGame::levelWon()
 {
     mW->userLvl ++; // Increment the user level.
     mW->restartGame();
+}
 
+void mainGame::levelLost()
+{
+    mW->restartGame();
 }
 
 void mainGame::onPlantButtonClicked(int index)

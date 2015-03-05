@@ -28,9 +28,6 @@ myView::myView(QWidget *parent, mainGame *rMG) :
 
     for (int i = 0; i < ROWS; i++) zombieGridList->append(new QList<QGraphicsPixmapItem*>());
 
-
-
-
     maxZombies = mG->maxZombies; // Set the max number of zombies.
     //maxZombies = 2;
     currentZombies = 0; // No zombies spawned yet.
@@ -38,6 +35,7 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     //The gambe board tiles.
     grass = new Grass();
     dirt = new Dirt();
+    lawnmower = new Lawnmower();
 
     sun = new Sun(HEIGHT/ROWS);
     bullet = new Bullet(this);
@@ -50,12 +48,11 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     //So the scene handles the advance functions
     scene->addItem(sun);
     scene->addItem(bullet);
+    scene->addItem(lawnmower);
 
     for(int i = 0; i < zombieObj->size(); i++){
         scene->addItem(zombieObj->at(i));
-
     }
-    scene->addItem(zombieObj->back());
 
     for(int i = 0; i < mG->plantObj->size(); i++){
         scene->addItem(mG->plantObj->at(i));
@@ -104,10 +101,21 @@ myView::myView(QWidget *parent, mainGame *rMG) :
             {
                 QGraphicsPixmapItem* g = scene->addPixmap(*grass->getGrass((i%2 == j%2)));
                 g->setPos(j*gameBlockWidth, i*gameBlockHeight);
-
                 //Add the new rectangle to the array to hold the grid.
                 grid[i][j] = QRectF(g->pos(), QSize(gameBlockWidth, gameBlockHeight));
                 plantGrid[i][j] = NULL;
+            }
+            for(int j = 0; j < COLUMNS; j++)
+            {
+                if(j == 0)
+                {
+                    //Add lawnmowers.
+                    lawnmower->instances->append(plantGrid[i][j] = scene->addPixmap(lawnmower->pixmap()));
+                    lawnmower->instances->back()->setPos(j*gameBlockWidth,i*gameBlockHeight);
+                    lawnmower->instances->back()->setData(PvZ::ROW_INDEX,QVariant(i));
+                    lawnmower->instances->back()->setData(PvZ::COLUMN_INDEX,QVariant(j));
+                    lawnmower->onPlant(this);
+                }
             }
         }else
         {
@@ -130,6 +138,11 @@ myView::myView(QWidget *parent, mainGame *rMG) :
     sun->instances->append(scene->addPixmap(sun->pixmap()));
     sun->instances->back()->setPos(random(0, COLUMNS - 1) * gameBlockWidth + gameBlockWidth/4,0);
     sun->onCreate(true, random(0, ROWS - 1));
+}
+
+void myView::levelLost()
+{
+    mG->levelLost();
 }
 
 //Returns a random number.
@@ -221,6 +234,7 @@ void myView::plantShoot(int plantObjectType, int plantInstanceIndex, bool slow)
 
 void myView::damageZombie(int zombieObjectIndex, int zombieInstanceIndex, int zombieGridInstance, int damage, bool slow)
 {
+
     int tempLife = zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::INSTANCE_LIFE).toInt();
     int row = zombieObj->at(zombieObjectIndex)->instances->at(zombieInstanceIndex)->data(PvZ::ROW_INDEX).toInt();
     tempLife -= damage;
@@ -374,8 +388,23 @@ void myView::mousePressEvent(QMouseEvent *event)
         {
             for(int j = 0; j < COLUMNS; j++)
             {
+                bool repeater = false;
                 //If the user clicks within a grid item AND that grid item isnt filled...
-                if(grid[i][j].contains(event->pos()) && (plantGrid[i][j] == NULL) ){
+                if((grid[i][j].contains(event->pos()) && (plantGrid[i][j] == NULL)) || (repeater = ((grid[i][j].contains(event->pos())) && (mG->plantSelected == 7) && (plantGrid[i][j] != NULL) && (plantGrid[i][j]->data(PvZ::PLANT_TYPE).toInt() == 1)))){
+                    if(repeater)
+                    {
+                        //Destroy the peashooter that was there before.
+                        scene->removeItem(plantGrid[i][j]);
+                        int obj = plantGrid[i][j]->data(PvZ::PLANT_TYPE).toInt();
+                        (mG->plantObj->at(obj))->destroy(plantGrid[i][j]->data(PvZ::INSTANCE_INDEX).toInt());
+                        plantGrid[i][j] = NULL;
+                        //Update instances.
+                        for(int i = 0; i < mG->plantObj->at(obj)->instances->size(); i++) mG->plantObj->at(obj)->instances->at(i)->setData(PvZ::INSTANCE_INDEX, i);
+
+                    }else{
+                        //Return if the user is trying to plant a repeater invalidly
+                        if(mG->plantSelected == 7)  return;
+                    }
                     // Plant the new plant.
                     mG->plantObj->at(mG->plantSelected)->instances->append(plantGrid[i][j] = scene->addPixmap(mG->plantObj->at(mG->plantSelected)->pixmap()));
                     mG->plantObj->at(mG->plantSelected)->instances->back()->setPos(j * gameBlockWidth, i * gameBlockHeight);

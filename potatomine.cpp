@@ -6,7 +6,7 @@ PotatoMine::PotatoMine()
     this->cost = 25;
     this->life = 4;
     this->range = 1;
-    this->rate = 3;
+    this->rate = 15;
     this->damage = 90;
     this->bomb = true;
     this->seeding = 30;
@@ -23,7 +23,7 @@ void PotatoMine::advance(int phase)
 {
     if(!phase) return;
 
-    qDebug() << "Potates.size() Init: " << instances->size() << endl;
+    //qDebug() << "Potates.size() Init: " << instances->size() << endl;
     for(int i = 0; i < instances->size(); i++)
     {
         //Set up Potato ready state (blows up zombies, yo)
@@ -34,8 +34,8 @@ void PotatoMine::advance(int phase)
             instances->at(i)->setFlag(QGraphicsItem::ItemIsMovable,true);
         }
 
-        qDebug() << "Potates.size() Loop Start: " << instances->size() << endl;
-        qDebug() << "Potates Index : " << i << endl;
+        //qDebug() << "Potates.size() Loop Start: " << instances->size() << endl;
+        //qDebug() << "Potates Index : " << i << endl;
         //If the potatomine is ready to kill zombies...
         if(instances->at(i)->flags().testFlag(QGraphicsItem::ItemIsMovable))
         {
@@ -53,13 +53,13 @@ void PotatoMine::advance(int phase)
                     int zombieInstance = zombieGridList->at(instances->at(i)->data(PvZ::ROW_INDEX).toInt())->at(j)->data(PvZ::INSTANCE_INDEX).toInt();
                     //Damage the zombie.
                     mV->damageZombie(zombieObject,zombieInstance, j , instances->at(i)->data(PvZ::INSTANCE_DAMAGE).toInt(),false);
-                    qDebug() << "Potates.size() Before: " << instances->size() << endl;
+                    //qDebug() << "Potates.size() Before: " << instances->size() << endl;
                     //Remove the plant from the plant Grid.
                     mV->plantGrid[instances->at(i)->data(ROW_INDEX).toInt()][instances->at(i)->data(COLUMN_INDEX).toInt()] = NULL;
                     delete instances->at(i);
                     instances->removeAt(i);
                     i--;
-                    qDebug() << "Potates.size() After: " << instances->size() << endl;
+                    //qDebug() << "Potates.size() After: " << instances->size() << endl;
 
                     break;
                 }

@@ -74,23 +74,68 @@ MainWindow::~MainWindow()
 
 void MainWindow::restartGame()
 {
-    //Delete the previous mG instance
-    delete mG;
-    //set a new mG instance.
-    mG = new mainGame(0,this);
-    mG->show();
+    if(userLvl > 8)
+    {
+        QMessageBox::about(this,"Congratulations","You beat the game!!");
+        userLvl = 1; // Reset the level to 1.
+        //Re-write the new user information back at lvl 1.
+        QString tempFile = QCoreApplication::applicationDirPath() + "/pvz_players.csv";
+        QFile save_file (tempFile);
+
+        if(save_file.open(QIODevice::ReadWrite | QIODevice::Text))
+        {
+            QString s;
+            QTextStream t(&save_file);
+            while(!t.atEnd())
+            {
+                QString line = t.readLine();
+                //If this line doesnt contain the users name, rewrite it
+                if(!line.contains(lastUser))
+                {
+                    s.append(line + "\n");
+                    continue;
+                }
+                //Else write the users new data.
+                int time = QDateTime::currentDateTime().toTime_t();
+                //Append the new user timestamp and level.
+                s.append(QString("%1").arg(time) + ":" + lastUser + ":" + QString("%1").arg(userLvl) + "\n");
+            }
+            //re-write the file with the new user's saved data.
+            save_file.resize(0);
+            t << s;
+            save_file.close();
+
+        }
+        ui->usernameLbl->setText(lastUser);
+        ui->lvlLbl->setText(QString("Current Level: %1").arg(userLvl));
+        delete mG; // Delete the main game instance
+        this->show(); // Show this function;
+    }else
+    {
+        //Delete the previous mG instance
+        delete mG;
+        //set a new mG instance.
+        mG = new mainGame(0,this);
+        mG->show();
+    }
+
+}
+
+void MainWindow::loseGame()
+{
+    delete mG; //Delete the instance of main game.
+
 }
 
 void MainWindow::on_startBtn_clicked()
 {
-
 
     //Show the new game window
     mG = new mainGame(0,this);
     mG->show();
 
     //Hide this current window
-    this->close();
+    this->hide();
 }
 
 

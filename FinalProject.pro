@@ -39,7 +39,8 @@ SOURCES += main.cpp\
     buckethead.cpp \
     newspaper.cpp \
     pausemenu.cpp \
-    repeater.cpp
+    repeater.cpp \
+    lawnmower.cpp
 
 HEADERS  += mainwindow.h \
     maingame.h \

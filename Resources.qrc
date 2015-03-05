@@ -46,4 +46,7 @@
         <file>ChangeUser.png</file>
         <file>Menu.png</file>
     </qresource>
+    <qresource prefix="/Lawnmower">
+        <file>Lawnmower.png</file>
+    </qresource>
 </RCC>

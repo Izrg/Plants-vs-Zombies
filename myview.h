@@ -27,6 +27,7 @@ class Zombie;
 class Regular;
 class QGraphicsScene;
 class Plant;
+class Lawnmower;
 class myView : public QGraphicsView
 {
     Q_OBJECT
@@ -36,10 +37,11 @@ public:
 
     //List for Plant Parent Classes
     QList <Plant*> *plantObj;
-
+    void levelLost();
 
     //Lists for Zombies
     QList <Zombie*> *zombieObj; //Holds the "parent" class
+
      //Holds references to the children being drawn
     //Level Params ?
 
@@ -52,6 +54,8 @@ public:
     Sun *sun;
     //Initilize bullets.
     Bullet *bullet;
+    //Initilize lawnmowers
+    Lawnmower *lawnmower;
 
     mainGame *mG; // mainGame forward declaration.
     QGraphicsScene *scene; // The graphics scene.
@@ -77,6 +81,7 @@ public:
     void plantShoot(int,int,bool);
     void damageZombie(int zombieObject,int zombieInstance, int zombieGridInstance, int damage, bool slow);
     void destroyPlant(int row, int column);
+
 
     QTimer *moveTimer;
     QTimer *sunTimer;
